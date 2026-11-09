@@ -1,15 +1,15 @@
 # SPEC-002 — Задачи
 
 **Эпик:** [SPEC-002: Профиль клиента: карточка клиента и задачи по клиенту](./epic.md)
-**Статус:** not-started
+**Статус:** in-progress
 **Создан:** 2026-11-09
 
 ## Индекс задач
 
 | ID | Название | Тип | Размер | Статус | Blocked by | Blocks |
 |---|---|---|---|---|---|---|
-| T-001 | Слой данных: HTTP-клиент, хук загрузки, сущности `customer` и `customer-task` | feature | M | not-started | — | T-003, T-004 |
-| T-002 | Общие UI-элементы и словарь строк | feature | M | not-started | — | T-003, T-004 |
+| T-001 | Слой данных: HTTP-клиент, хук загрузки, сущности `customer` и `customer-task` | feature | M | completed | — | T-003, T-004 |
+| T-002 | Общие UI-элементы и словарь строк | feature | M | completed | — | T-003, T-004 |
 | T-003 | Виджет `profile-card` | feature | M | not-started | T-001, T-002 | T-005 |
 | T-004 | Виджет `customer-tasks` | feature | M | not-started | T-001, T-002 | T-005 |
 | T-005 | Страница `customer`: разбор id и сборка | feature | S | not-started | T-003, T-004 | — |
@@ -69,7 +69,7 @@ flowchart LR
 |---|---|
 | Тип | feature |
 | Размер | M |
-| Статус | not-started |
+| Статус | completed |
 | Scope paths | `src/shared/api/**`, `src/entities/customer/**`, `src/entities/customer-task/**` |
 | Blocked by | — |
 | Blocks | T-003, T-004 |
@@ -242,7 +242,7 @@ export function useCustomerTasks(customerId: number): ILoadResult<CustomerTask[]
 |---|---|
 | Тип | feature |
 | Размер | M |
-| Статус | not-started |
+| Статус | completed |
 | Scope paths | `src/shared/ui/Card/**`, `src/shared/ui/StatusBadge/**`, `src/shared/ui/Avatar/**`, `src/shared/ui/Loader/**`, `src/shared/ui/index.ts`, `src/shared/i18n/he.ts` |
 | Blocked by | — |
 | Blocks | T-003, T-004 |

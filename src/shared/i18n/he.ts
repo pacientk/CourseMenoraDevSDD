@@ -22,4 +22,28 @@ export const he = {
     title: 'הדף לא נמצא',
     backLink: 'חזרה לתמונת הלקוח',
   },
+  states: {
+    notFound: 'הלקוח לא נמצא',
+    error: 'לא הצלחנו לטעון את הנתונים',
+    retry: 'נסו שוב',
+  },
+  profileCard: {
+    title: 'פרטי לקוח',
+    loading: 'טוען פרטי לקוח',
+    fields: {
+      id: 'מס׳ לקוח',
+      phone: 'טלפון',
+      email: 'דוא״ל',
+      city: 'עיר',
+    },
+  },
+  customerTasks: {
+    title: 'משימות טיפול',
+    loading: 'טוען משימות',
+    empty: 'אין משימות ללקוח',
+    status: {
+      open: 'פתוח',
+      done: 'בוצע',
+    },
+  },
 } as const

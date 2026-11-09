@@ -1,0 +1,22 @@
+.avatar {
+  display: inline-flex;
+  flex: none;
+  inline-size: var(--space-16);
+  block-size: var(--space-16);
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--action-tonal);
+  color: var(--text-brand);
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-xl);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+.image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
