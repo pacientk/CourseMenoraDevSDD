@@ -42,3 +42,11 @@ findings:
   - previous: F-2 resolved (min-inline-size в трёх местах, физических min/max-width в src/**/*.css нет)
   - previous: F-3 resolved (повтор профиля запрашивает только /users/1)
   - новых находок нет
+
+## Security — 2026-11-09
+tool: /security-review
+result: no findings
+audit: npm run audit:deps → 0 high (found 0 vulnerabilities)
+findings:
+  - none
+note: /security-review прочитал полностью только httpClient.ts, mapCustomer.ts, mapCustomerTasks.ts, Avatar.tsx, resourceId.ts; остальные файлы диффа не открывал. Находок уровня high/medium нет. Проверены: XSS-синки, схема avatar URL (только https://), построение URL запроса, белый список полей (password/ssn/bank не выходят за маппер), логирование.
