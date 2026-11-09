@@ -10,8 +10,8 @@
 |---|---|---|---|---|---|---|
 | T-001 | Слой данных: HTTP-клиент, хук загрузки, сущности `customer` и `customer-task` | feature | M | completed | — | T-003, T-004 |
 | T-002 | Общие UI-элементы и словарь строк | feature | M | completed | — | T-003, T-004 |
-| T-003 | Виджет `profile-card` | feature | M | not-started | T-001, T-002 | T-005 |
-| T-004 | Виджет `customer-tasks` | feature | M | not-started | T-001, T-002 | T-005 |
+| T-003 | Виджет `profile-card` | feature | M | completed | T-001, T-002 | T-005 |
+| T-004 | Виджет `customer-tasks` | feature | M | completed | T-001, T-002 | T-005 |
 | T-005 | Страница `customer`: разбор id и сборка | feature | S | not-started | T-003, T-004 | — |
 
 Размер: `S` — один компонент или модуль; `M` — несколько файлов, небольшие проектные
@@ -363,7 +363,7 @@ interface ILoaderProps { label: string }
 |---|---|
 | Тип | feature |
 | Размер | M |
-| Статус | not-started |
+| Статус | completed |
 | Scope paths | `src/widgets/profile-card/**` |
 | Blocked by | T-001, T-002 |
 | Blocks | T-005 |
@@ -491,7 +491,7 @@ interface IProfileCardProps { customerId: number }
 |---|---|
 | Тип | feature |
 | Размер | M |
-| Статус | not-started |
+| Статус | completed |
 | Scope paths | `src/widgets/customer-tasks/**` |
 | Blocked by | T-001, T-002 |
 | Blocks | T-005 |
