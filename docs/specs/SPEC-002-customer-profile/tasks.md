@@ -12,7 +12,7 @@
 | T-002 | Общие UI-элементы и словарь строк | feature | M | completed | — | T-003, T-004 |
 | T-003 | Виджет `profile-card` | feature | M | completed | T-001, T-002 | T-005 |
 | T-004 | Виджет `customer-tasks` | feature | M | completed | T-001, T-002 | T-005 |
-| T-005 | Страница `customer`: разбор id и сборка | feature | S | not-started | T-003, T-004 | — |
+| T-005 | Страница `customer`: разбор id и сборка | feature | S | completed | T-003, T-004 | — |
 
 Размер: `S` — один компонент или модуль; `M` — несколько файлов, небольшие проектные
 решения. T-001 — верхняя граница `M` (три модуля в трёх слайсах); если исполнитель
@@ -609,7 +609,7 @@ interface ICustomerTasksProps { customerId: number }
 |---|---|
 | Тип | feature |
 | Размер | S |
-| Статус | not-started |
+| Статус | completed |
 | Scope paths | `src/pages/customer/**`, `src/app/__tests__/App.test.tsx` |
 | Blocked by | T-003, T-004 |
 | Blocks | — |

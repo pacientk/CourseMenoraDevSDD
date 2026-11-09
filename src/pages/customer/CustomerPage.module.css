@@ -17,5 +17,16 @@
 }
 
 .content {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--space-6);
   margin-block-start: var(--space-6);
+}
+
+.notFound {
+  grid-column: 1 / -1;
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-lg);
 }

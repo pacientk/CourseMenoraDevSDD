@@ -1,9 +1,21 @@
 import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { customerPath, DEFAULT_CUSTOMER_ID } from '@/shared/config/routes'
 import { he } from '@/shared/i18n/he'
 import { AppRouter } from '../AppRouter'
+
+// The customer page now loads data: keep the shell tests off the network.
+beforeEach(() => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => new Promise<Response>(() => {})),
+  )
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 function renderAt(path: string) {
   return render(
