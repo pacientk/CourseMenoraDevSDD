@@ -1,0 +1,7 @@
+[
+  { "id": 101, "todo": "Send the missing accident report", "completed": false, "userId": 1 },
+  { "id": 102, "todo": "Confirm the home policy renewal", "completed": true, "userId": 1 },
+  { "id": 201, "todo": "Call back about the health policy signature", "completed": false, "userId": 2 },
+  { "id": 202, "todo": "Update the contact phone number", "completed": false, "userId": 2 },
+  { "id": 203, "todo": "Send the replacement car voucher", "completed": true, "userId": 2 }
+]

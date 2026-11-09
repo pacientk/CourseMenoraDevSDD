@@ -1,0 +1,8 @@
+{
+  "name": "reviewer",
+  "displayName": "Reviewer",
+  "description": "Independent, read-only code reviewer for any project: re-runs the gates, attacks the logic, checks the task and the project's standards, and returns a verdict with findings for the implementer. Zero setup; applies the engineering-standards kit when the project has a standards.config.json.",
+  "version": "0.3.0",
+  "author": { "name": "Kirill Ter" },
+  "keywords": ["code-review", "review", "standards", "react", "react-native", "typescript"]
+}
