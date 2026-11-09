@@ -108,6 +108,36 @@ describe('useAsyncResource', () => {
     expect(result.current.state).toEqual({ status: 'success', data: 'two' })
   })
 
+  it('shows loading when returning to a key whose old result was stored (A -> B -> A)', async () => {
+    const loads: Array<(value: string) => void> = []
+    const { result, rerender } = renderHook(
+      ({ id }) =>
+        useAsyncResource(id, () => new Promise<string>((resolve) => loads.push(resolve))),
+      { initialProps: { id: 1 } },
+    )
+    act(() => {
+      loads[0]?.('first')
+    })
+    await waitFor(() => {
+      expect(result.current.state).toEqual({ status: 'success', data: 'first' })
+    })
+
+    rerender({ id: 2 })
+    expect(result.current.state).toEqual({ status: 'loading' })
+    rerender({ id: 1 })
+    expect(result.current.state).toEqual({ status: 'loading' })
+    await waitFor(() => {
+      expect(loads).toHaveLength(3)
+    })
+    expect(result.current.state).toEqual({ status: 'loading' })
+    act(() => {
+      loads[2]?.('again')
+    })
+    await waitFor(() => {
+      expect(result.current.state).toEqual({ status: 'success', data: 'again' })
+    })
+  })
+
   it('does not show previous key data while the new key loads', async () => {
     const { result, rerender } = renderHook(
       ({ id }) =>

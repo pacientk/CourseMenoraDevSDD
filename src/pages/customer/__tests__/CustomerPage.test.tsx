@@ -114,19 +114,30 @@ describe('CustomerPage', () => {
       expect(screen.getByText('Emily Tester')).toBeInTheDocument()
     })
 
-    it('keeps the tasks when the profile fails', async () => {
-      stubFetch((url) =>
-        Promise.resolve(
-          url === `${BASE}/users/1`
-            ? jsonResponse({}, 500)
-            : jsonResponse(todosBody(5, 'Call back')),
-        ),
-      )
+    it('keeps the tasks when the profile fails and retries only the profile', async () => {
+      let profileFails = true
+      const fetchMock = stubFetch((url) => {
+        if (url === `${BASE}/users/1`) {
+          return Promise.resolve(
+            profileFails ? jsonResponse({}, 500) : jsonResponse(userBody(1, 'Emily')),
+          )
+        }
+        return Promise.resolve(jsonResponse(todosBody(5, 'Call back')))
+      })
       renderAt('/customers/1')
 
       expect(await screen.findByText('Call back')).toBeInTheDocument()
       expect(await screen.findByRole('alert')).toHaveTextContent(he.states.error)
       expect(screen.getAllByRole('alert')).toHaveLength(1)
+
+      profileFails = false
+      const callsBefore = fetchMock.mock.calls.length
+      await userEvent.click(screen.getByRole('button', { name: he.states.retry }))
+
+      expect(await screen.findByText('Emily Tester')).toBeInTheDocument()
+      const newUrls = fetchMock.mock.calls.slice(callsBefore).map((call) => call[0])
+      expect(newUrls).toEqual([`${BASE}/users/1`])
+      expect(screen.getByText('Call back')).toBeInTheDocument()
     })
   })
 

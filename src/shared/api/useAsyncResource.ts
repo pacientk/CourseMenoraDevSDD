@@ -20,6 +20,7 @@ export function useAsyncResource<T>(
 ): ILoadResult<T> {
   const [stored, setStored] = useState<IStoredResult<T> | null>(null)
   const [reloadToken, setReloadToken] = useState(0)
+  const [seenKey, setSeenKey] = useState(key)
   const loadRef = useRef(load)
 
   useEffect(() => {
@@ -48,6 +49,13 @@ export function useAsyncResource<T>(
       controller.abort()
     }
   }, [key, reloadToken])
+
+  // Смена ключа сбрасывает сохранённый результат в том же рендере: иначе при возврате
+  // A → B → A старый результат A показался бы, пока новый запрос ещё в полёте.
+  if (!Object.is(seenKey, key)) {
+    setSeenKey(key)
+    setStored(null)
+  }
 
   // Результат другого ключа или прежней попытки не показываем ни на один кадр.
   // Object.is: NaN === NaN ложно, а невалидный id (NaN) обязан дойти до состояния error.

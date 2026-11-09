@@ -22,7 +22,7 @@
 }
 
 .text {
-  min-width: 0;
+  min-inline-size: 0;
   overflow-wrap: anywhere;
   text-align: start;
   color: var(--text-primary);
