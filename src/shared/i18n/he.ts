@@ -1,8 +1,25 @@
 // Единственное место для пользовательских строк (react.ui.strings).
 // Компоненты не содержат строковых литералов — только ссылки на этот словарь.
 export const he = {
-  app: {
+  header: {
+    brand: 'מנורה מבטחים',
+    product: 'מרכז שירות',
+    navLabel: 'ניווט ראשי',
+    nav: {
+      customers: 'לקוחות',
+      claims: 'תביעות',
+      history: 'היסטוריית קשר',
+    },
+  },
+  customerPage: {
     title: 'תמונת לקוח 360',
-    starterHint: 'שלד הפרויקט מוכן. מתחילים מ-SPEC-001.',
+    subtitle: 'כל המידע לשיחה, במקום אחד',
+  },
+  comingSoon: {
+    text: 'בקרוב',
+  },
+  notFound: {
+    title: 'הדף לא נמצא',
+    backLink: 'חזרה לתמונת הלקוח',
   },
 } as const
