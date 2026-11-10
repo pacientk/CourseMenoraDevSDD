@@ -47,7 +47,7 @@ workshop/
   briefs/                       product briefs for SPEC-002 and SPEC-003
   reference/                    the agent pattern we create our own agent from
   fallback/                     ready-made agent in case something goes wrong
-  golden/                       reference documents for SPEC-002
+  golden/                       reference documents for SPEC-002; ready approved spec for SPEC-003
 scripts/                        doctor, catchup, spec-lint
 src/                            the app: app · pages · widgets · entities · shared
 mocks/                          offline copy of the API
@@ -68,6 +68,7 @@ mocks/                          offline copy of the API
 
 ## After the meeting
 
-- Self-study assignment: `workshop/briefs/SPEC-003-customer-search.md`.
+- SPEC-003 (customer search): a ready, approved spec in `workshop/golden/SPEC-003-customer-search/`
+  for spare time at the meeting; the brief in `workshop/briefs/` for writing it yourself.
 - The `sdd` skill is a workshop extract. What is simplified compared with the full
   version is listed at the end of `.github/skills/sdd/SKILL.md`.

@@ -18,7 +18,7 @@ const CHECKPOINTS = [
   { n: 5, tag: 'cp/5-wave-2', branch: SPEC_002_BRANCH, title: 'Wave 2 done', next: 'step 5: /sdd run SPEC-002 --commit (wave 3)' },
   { n: 6, tag: 'cp/6-wave-3', branch: SPEC_002_BRANCH, title: 'Wave 3 done, the page works', next: 'step 6: /review' },
   { n: 7, tag: 'cp/7-review-fixed', branch: SPEC_002_BRANCH, title: 'Review passed, findings fixed', next: 'step 7: /security-review' },
-  { n: 8, tag: 'cp/8-spec-002-done', branch: 'main', title: 'SPEC-002 closed and merged into main', next: 'done: /sdd status' },
+  { n: 8, tag: 'cp/8-spec-002-done', branch: 'main', title: 'SPEC-002 closed and merged into main', next: 'done: /sdd status — or step 8 (SPEC-003, ready spec)' },
 ]
 
 function git(args, { allowFail = false } = {}) {

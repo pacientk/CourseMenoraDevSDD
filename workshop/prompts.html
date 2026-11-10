@@ -83,7 +83,7 @@ nav.toc { display: flex; flex-wrap: wrap; gap: .4em .9em; margin: 0 0 1em; font-
       <option value="step5">5 · Waves</option>
       <option value="step6">6 · Review</option>
       <option value="step7">7 · Security, build</option>
-      <option value="step8">8 · SPEC-003</option>
+      <option value="step8">8 · SPEC-003 (spare time / homework)</option>
       <option value="cheatsheet">Cheat sheet</option>
     </select>
     <button type="button" id="prev" title="Previous step" aria-label="Previous step">↑</button>
@@ -359,12 +359,39 @@ For every finding give the file, the line, the attack scenario and the severity.
 Do not change the code.</pre>
 </div>
 
-<h2 id="step8">Step 8 — On your own after the meeting: SPEC-003</h2>
-<p>Searching for another customer. Brief: <code>workshop/briefs/SPEC-003-customer-search.md</code>. Walk the full cycle yourself — and this time do not skip the review for the small spec.</p>
+<h2 id="step8">Step 8 — SPEC-003: searching for another customer</h2>
+<p>Two ways to do it, depending on the time left.</p>
+<h3>A. Time left at the meeting — ready spec, straight to execution</h3>
+<p>An approved small spec is prepared: <code>workshop/golden/SPEC-003-customer-search/spec.md</code>. It requires SPEC-002 merged into <code>main</code>. Copy it into <code>docs/specs/</code>, read sections 3–5 (two minutes), then run the familiar chain — this time with the review.</p>
+<span class="label term">Terminal</span>
+<pre data-os="win" data-copy>Copy-Item -Recurse workshop\golden\SPEC-003-customer-search docs\specs\SPEC-003-customer-search</pre>
+<pre data-os="mac" data-copy>cp -r workshop/golden/SPEC-003-customer-search docs/specs/SPEC-003-customer-search</pre>
+<span class="label chat">Copilot Chat</span> — new chat, execution (gate G4; the orchestrator creates the branch <code>spec/003-customer-search</code>)
+<pre data-copy>/sdd run SPEC-003 --commit</pre>
+<span class="label term">Terminal</span> — check in the browser: type <code>em</code> in the search field on <code>/customers/1</code>
+<pre data-copy>npm run dev</pre>
+<span class="label chat">Copilot Chat</span> — new chat, review (gate G5), then fixes and round 2 as in step 6
+<pre data-copy>/review task: docs/specs/SPEC-003-customer-search/spec.md</pre>
+<pre data-copy>/sdd fix SPEC-003</pre>
+<span class="label chat">Copilot Chat</span> — new chat, security and close (gates G6–G8)
+<pre data-copy>/security-review</pre>
+<pre data-copy>/sdd close SPEC-003
+
+Take the /security-review result from this conversation and record it in review.log.md.</pre>
+<span class="label chat">Copilot Chat</span> — merge
+<pre data-copy>Commit the spec closure with the message: docs(SPEC-003): close, release notes.
+Then switch to main and merge the branch spec/003-customer-search with --no-ff. Do not push.</pre>
+<h3>B. On your own after the meeting — write the spec yourself</h3>
+<p>Brief: <code>workshop/briefs/SPEC-003-customer-search.md</code>. Walk the full cycle from gate G0: decide the track, write the spec, approve it yourself, execute, review, security, close. Compare your spec with the prepared one afterwards — not before.</p>
 <span class="label chat">Copilot Chat</span>
 <pre data-copy>/sdd small customer-search
 
 Brief: workshop/briefs/SPEC-003-customer-search.md</pre>
+<div class="fallback">
+  <h3>If it did not work</h3>
+  <p>The orchestrator refuses with "SPEC-002 is not done" or the page has no profile card — SPEC-003 builds on SPEC-002; finish or catch up to checkpoint 8 first (<code>npm run catchup -- 8</code>).</p>
+  <p>The implementer asks where the page component lives — answer with the path from your SPEC-002 (<code>src/pages/customer/…</code>); the spec leaves the file name to SPEC-002 on purpose.</p>
+</div>
 
 <h2 id="cheatsheet">Cheat sheet</h2>
 <table>
