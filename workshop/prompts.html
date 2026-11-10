@@ -19,12 +19,29 @@
     --code-bg: #0F0E1C; --ok-soft: #10311F;
   }
 }
+:root[data-theme="dark"] {
+  --bg: #17152A; --surface: #211E38; --ink: #F1F0FA; --ink-2: #C6C4DC; --ink-3: #9997B4;
+  --line: #37345A; --accent: #B39BFF; --accent-soft: #2E2752; --hi-soft: #40350B;
+  --code-bg: #0F0E1C; --ok-soft: #10311F;
+}
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.5; }
-.wrap { max-width: 60em; margin: 0 auto; padding: 1.5em 16px 5em; }
-header { display: flex; flex-wrap: wrap; gap: 1em; align-items: center; justify-content: space-between; margin-bottom: 1.5em; }
+.wrap { max-width: 60em; margin: 0 auto; padding: 4.2em 16px 5em; }
+header { margin-bottom: 1.5em; }
+/* always-visible toolbar */
+.bar { position: fixed; top: 0; inset-inline: 0; z-index: 10; display: flex; flex-wrap: wrap; gap: .5em .7em; align-items: center; justify-content: flex-end; padding: .5em 16px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); font-size: .9em; }
+.bar .brand { margin-inline-end: auto; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.bar select, .bar button { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: .5em; padding: .3em .6em; cursor: pointer; }
+.bar .os { display: inline-flex; border: 1px solid var(--line); border-radius: 99em; overflow: hidden; background: var(--surface); }
+.bar .os button { border: 0; border-radius: 0; background: none; padding: .3em .8em; }
+.bar .os button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.bar .group { display: inline-flex; gap: .3em; align-items: center; }
+.bar .ctx { color: var(--ink-3); font-size: .9em; white-space: nowrap; }
+@media (max-width: 720px) { .bar .brand, .bar .ctx { display: none; } .wrap { padding-top: 5.6em; } }
+body[data-os="win"] .label.term::after { content: " · PowerShell"; font-weight: 400; text-transform: none; letter-spacing: 0; }
+body[data-os="mac"] .label.term::after { content: " · zsh"; font-weight: 400; text-transform: none; letter-spacing: 0; }
 h1 { font-size: 1.6em; margin: 0; }
-h2 { font-size: 1.3em; margin: 2.2em 0 .6em; padding-top: 1.2em; border-top: 1px solid var(--line); }
+h2 { font-size: 1.3em; margin: 2.2em 0 .6em; padding-top: 1.2em; border-top: 1px solid var(--line); scroll-margin-top: 3.6em; }
 h3 { font-size: 1em; margin: 1.4em 0 .4em; color: var(--ink-2); }
 p, li { color: var(--ink-2); }
 a { color: var(--accent); }
@@ -43,28 +60,47 @@ table { border-collapse: collapse; width: 100%; margin: .8em 0; font-size: .95em
 th, td { padding: .45em .6em; border-bottom: 1px solid var(--line); text-align: start; vertical-align: top; color: var(--ink-2); }
 th { color: var(--ink-3); font-size: .85em; text-transform: uppercase; letter-spacing: .04em; }
 td:first-child { color: var(--ink); font-weight: 600; }
-.toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 99em; overflow: hidden; background: var(--surface); }
-.toggle button { padding: .4em 1em; border: 0; background: none; color: var(--ink-2); font: inherit; cursor: pointer; }
-.toggle button[aria-pressed="true"] { background: var(--accent); color: #fff; }
 body[data-os="win"] [data-os="mac"], body[data-os="mac"] [data-os="win"] { display: none; }
 kbd { font-family: var(--mono); font-size: .85em; padding: .05em .4em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: .3em; background: var(--surface); }
 nav.toc { display: flex; flex-wrap: wrap; gap: .4em .9em; margin: 0 0 1em; font-size: .92em; }
 .small { font-size: .9em; color: var(--ink-3); }
-@media print { .copy, .toggle { display: none; } pre { white-space: pre-wrap; } }
+@media print { .copy, .bar { display: none; } .wrap { padding-top: 0; } pre { white-space: pre-wrap; } }
 </style>
 </head>
 <body data-os="win">
+<div class="bar" role="toolbar" aria-label="Page tools">
+  <span class="brand">SDD Workshop · prompts</span>
+  <span class="group">
+    <label class="ctx" for="jump">Step</label>
+    <select id="jump" aria-label="Jump to a step">
+      <option value="">—</option>
+      <option value="catchup">Catch up</option>
+      <option value="step0">0 · Before the meeting</option>
+      <option value="step1">1 · Copilot and agents</option>
+      <option value="step2">2 · Create the agent</option>
+      <option value="step3">3 · SPEC-001</option>
+      <option value="step4">4 · Epic, tasks, plan</option>
+      <option value="step5">5 · Waves</option>
+      <option value="step6">6 · Review</option>
+      <option value="step7">7 · Security, build</option>
+      <option value="step8">8 · SPEC-003</option>
+      <option value="cheatsheet">Cheat sheet</option>
+    </select>
+    <button type="button" id="prev" title="Previous step" aria-label="Previous step">↑</button>
+    <button type="button" id="next" title="Next step" aria-label="Next step">↓</button>
+  </span>
+  <span class="os" role="group" aria-label="Operating system">
+    <button type="button" data-set-os="win" aria-pressed="true">Windows</button>
+    <button type="button" data-set-os="mac" aria-pressed="false">macOS</button>
+  </span>
+  <button type="button" id="theme" title="Light / dark" aria-label="Toggle light and dark theme">◐</button>
+  <button type="button" id="top" title="Back to top">Top</button>
+</div>
 <div class="wrap">
 
 <header>
-  <div>
-    <h1>SDD Workshop — prompts to copy and paste</h1>
-    <p class="small">Every command and prompt of the meeting, step by step. <span class="label term">Terminal</span> blocks run in the VS Code terminal; <span class="label chat">Copilot Chat</span> blocks are pasted into the Copilot Chat panel in <strong>Agent</strong> mode.</p>
-  </div>
-  <div class="toggle" role="group" aria-label="Operating system">
-    <button type="button" data-set-os="win" aria-pressed="true">Windows</button>
-    <button type="button" data-set-os="mac" aria-pressed="false">macOS</button>
-  </div>
+  <h1>SDD Workshop — prompts to copy and paste</h1>
+  <p class="small">Every command and prompt of the meeting, step by step. <span class="label term">Terminal</span> blocks run in the VS Code terminal; <span class="label chat">Copilot Chat</span> blocks are pasted into the Copilot Chat panel in <strong>Agent</strong> mode. The toolbar at the top follows you: switch Windows / macOS there — it changes shortcuts, shell commands and shell names on this page.</p>
 </header>
 
 <nav class="toc">
@@ -75,6 +111,7 @@ nav.toc { display: flex; flex-wrap: wrap; gap: .4em .9em; margin: 0 0 1em; font-
   <strong>Working with Copilot during the workshop.</strong>
   Open Copilot Chat with <kbd data-os="win">Ctrl+Alt+I</kbd><kbd data-os="mac">⌃⌘I</kbd>, pick <strong>Agent</strong> in the mode dropdown, and start a <strong>new chat</strong> at every step marked "new chat".
   When Copilot asks to run a terminal command, read it and press <em>Allow</em> — the gate and git commands are pre-approved in <code>.vscode/settings.json</code>, anything else is worth a glance.
+  Paste a copied prompt with <kbd data-os="win">Ctrl+V</kbd><kbd data-os="mac">⌘V</kbd>; send it with <kbd>Enter</kbd> (a new line inside a prompt is <kbd>Shift+Enter</kbd>).
   Edited files appear as pending changes: press <em>Keep</em> after you have looked at them.
   Fell behind or something broke? Every step ends with an "If it did not work" box.
 </div>
@@ -100,12 +137,23 @@ nav.toc { display: flex; flex-wrap: wrap; gap: .4em .9em; margin: 0 0 1em; font-
 <p>Your work is not lost: the command saves it on a <code>backup/…</code> branch and, if there were uncommitted changes, in <code>git stash</code>. After a jump, start a new Copilot chat.</p>
 
 <h2 id="step0">Step 0 — Before the meeting</h2>
+<p>You need Node.js 22.12 or newer, Git and VS Code with the GitHub Copilot and GitHub Copilot Chat extensions. Installers: <a href="https://nodejs.org">nodejs.org</a>, <a href="https://git-scm.com/downloads">git-scm.com</a>, <a href="https://code.visualstudio.com">code.visualstudio.com</a> — or from the terminal:</p>
+<span class="label term">Terminal</span>
+<pre data-os="win" data-copy>winget install OpenJS.NodeJS.LTS Git.Git Microsoft.VisualStudioCode</pre>
+<pre data-os="mac" data-copy>brew install node git</pre>
+<pre data-os="mac" data-copy>brew install --cask visual-studio-code</pre>
+<p data-os="win">Open a new <strong>PowerShell</strong> window afterwards so the new tools are on the PATH. If PowerShell refuses to run <code>npm</code> ("running scripts is disabled"), run once: <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>.</p>
+<p data-os="mac">On macOS the <code>code</code> command is not on the PATH by default: in VS Code open the Command Palette (<kbd>⇧⌘P</kbd>) and run <em>Shell Command: Install 'code' command in PATH</em> once.</p>
+<p>Then clone the course repository:</p>
 <span class="label term">Terminal</span>
 <pre data-copy>git clone https://github.com/pacientk/CourseMenoraDevSDD.git</pre>
 <pre data-copy>cd CourseMenoraDevSDD</pre>
 <pre data-copy>npm install</pre>
 <pre data-copy>npm run doctor</pre>
 <p><code>npm run doctor</code> must end with <strong>Ready</strong>. An <code>[INFO]</code> line about the <code>react-engineer</code> agent is expected: we create it during the meeting. A <code>[WARN]</code> about the API means your network blocks <code>dummyjson.com</code> — the project has an offline copy, you will use <code>npm run dev:offline</code>.</p>
+<p>Open this page from the clone so the links and copy buttons work locally:</p>
+<pre data-os="win" data-copy>start workshop\prompts.html</pre>
+<pre data-os="mac" data-copy>open workshop/prompts.html</pre>
 <p>Then open the project in VS Code:</p>
 <pre data-copy>code .</pre>
 <p>VS Code will ask whether you trust the folder — choose <em>Yes, I trust the authors</em>; agents, skills and prompt files do not load in restricted mode. Accept the recommended extensions (GitHub Copilot, GitHub Copilot Chat) if prompted, and sign in to GitHub.</p>
@@ -182,7 +230,7 @@ then write the file right away — do not wait for confirmation.</pre>
 <p>While the agent works, we look at the anatomy of a spec on the slide. The orchestrator launches <code>react-engineer</code> as a subagent, then re-runs <code>npm run validate</code> itself.</p>
 <span class="label term">Terminal</span> — second terminal, check in the browser
 <pre data-copy>npm run dev</pre>
-<p>Open <a href="http://localhost:5173">http://localhost:5173</a>: the address must change to <code>/customers/1</code>, the header shows three menu items. Stop the server with <kbd>Ctrl+C</kbd> when done.</p>
+<p>Open <a href="http://localhost:5173">http://localhost:5173</a>: the address must change to <code>/customers/1</code>, the header shows three menu items. Stop the server with <kbd data-os="win">Ctrl+C</kbd><kbd data-os="mac">⌃C</kbd> when done.</p>
 <span class="label chat">Copilot Chat</span> — where are we
 <pre data-copy>/sdd status</pre>
 <span class="label chat">Copilot Chat</span> — close SPEC-001 and return to main
@@ -360,6 +408,39 @@ Brief: workshop/briefs/SPEC-003-customer-search.md</pre>
   document.querySelectorAll('[data-set-os]').forEach((button) => {
     button.addEventListener('click', () => setOs(button.dataset.setOs, true));
   });
+
+  // Theme: light / dark, persisted; without a choice the system setting applies.
+  const THEME_KEY = 'sdd-workshop-theme';
+  const root = document.documentElement;
+  try { const saved = localStorage.getItem(THEME_KEY); if (saved === 'light' || saved === 'dark') root.dataset.theme = saved; } catch (_) { /* private mode */ }
+  document.getElementById('theme').addEventListener('click', () => {
+    const isDark = root.dataset.theme ? root.dataset.theme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const next = isDark ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem(THEME_KEY, next); } catch (_) { /* private mode */ }
+  });
+
+  // Step navigation: select, previous / next, top; the select follows the scroll position.
+  const jump = document.getElementById('jump');
+  const ids = Array.from(jump.options).map((option) => option.value).filter(Boolean);
+  const headings = ids.map((id) => document.getElementById(id));
+  function currentIndex() {
+    const line = window.scrollY + 90;
+    let current = -1;
+    headings.forEach((heading, i) => { if (heading && heading.offsetTop <= line) current = i; });
+    return current;
+  }
+  function go(i) {
+    const target = headings[Math.max(0, Math.min(headings.length - 1, i))];
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  jump.addEventListener('change', () => { if (jump.value) go(ids.indexOf(jump.value)); });
+  document.getElementById('prev').addEventListener('click', () => go(currentIndex() - 1));
+  document.getElementById('next').addEventListener('click', () => go(currentIndex() + 1));
+  document.getElementById('top').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  function syncSelect() { const i = currentIndex(); jump.value = i >= 0 ? ids[i] : ''; }
+  window.addEventListener('scroll', syncSelect, { passive: true });
+  syncSelect();
 
   document.querySelectorAll('pre[data-copy]').forEach((pre) => {
     const text = pre.textContent;
