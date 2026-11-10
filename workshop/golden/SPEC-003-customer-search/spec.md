@@ -7,7 +7,7 @@
 | ID | SPEC-003 |
 | Title | Search for another customer |
 | Track | small-spec |
-| Status | approved |
+| Status | draft |
 | Created | 2026-11-10 |
 | Owner | course lead |
 
@@ -246,4 +246,4 @@ Filled in by the orchestrator after the implementer's hand-off.
 
 | Date | Event | Result |
 |---|---|---|
-| 2026-11-10 | Spec approved by the course lead | prepared as a ready-to-run spec for the workshop |
+| 2026-11-10 | Spec prepared by the course lead as a ready draft | awaiting approval (gate G1) by the person who will run it |

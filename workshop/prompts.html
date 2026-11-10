@@ -361,11 +361,12 @@ Do not change the code.</pre>
 
 <h2 id="step8">Step 8 — SPEC-003: searching for another customer</h2>
 <p>Two ways to do it, depending on the time left.</p>
-<h3>A. Time left at the meeting — ready spec, straight to execution</h3>
-<p>An approved small spec is prepared: <code>workshop/golden/SPEC-003-customer-search/spec.md</code>. It requires SPEC-002 merged into <code>main</code>. Copy it into <code>docs/specs/</code>, read sections 3–5 (two minutes), then run the familiar chain — this time with the review.</p>
+<h3>A. Time left at the meeting — ready draft, you approve it</h3>
+<p>A small spec is written and waiting in <code>workshop/golden/SPEC-003-customer-search/spec.md</code>, in status <code>draft</code>. It requires SPEC-002 merged into <code>main</code>. Copy it into <code>docs/specs/</code>, then do gate G1 yourself: read sections 3–5 (three minutes), ask the four questions from step 4, and replace <code>draft</code> with <code>approved</code> in the Meta table. Only then run the familiar chain — this time with the review.</p>
 <span class="label term">Terminal</span>
 <pre data-os="win" data-copy>Copy-Item -Recurse workshop\golden\SPEC-003-customer-search docs\specs\SPEC-003-customer-search</pre>
 <pre data-os="mac" data-copy>cp -r workshop/golden/SPEC-003-customer-search docs/specs/SPEC-003-customer-search</pre>
+<p><strong>Gate G1:</strong> open <code>docs/specs/SPEC-003-customer-search/spec.md</code>, check the acceptance criteria, set <code>approved</code>, save. Without this the next command refuses to start — try it if you want to see the gate.</p>
 <span class="label chat">Copilot Chat</span> — new chat, execution (gate G4; the orchestrator creates the branch <code>spec/003-customer-search</code>)
 <pre data-copy>/sdd run SPEC-003 --commit</pre>
 <span class="label term">Terminal</span> — check in the browser: type <code>em</code> in the search field on <code>/customers/1</code>
@@ -389,6 +390,7 @@ Then switch to main and merge the branch spec/003-customer-search with --no-ff. 
 Brief: workshop/briefs/SPEC-003-customer-search.md</pre>
 <div class="fallback">
   <h3>If it did not work</h3>
+  <p>The orchestrator refuses because the spec is <code>draft</code> — that is gate G1 working: approve the spec in the file first.</p>
   <p>The orchestrator refuses with "SPEC-002 is not done" or the page has no profile card — SPEC-003 builds on SPEC-002; finish or catch up to checkpoint 8 first (<code>npm run catchup -- 8</code>).</p>
   <p>The implementer asks where the page component lives — answer with the path from your SPEC-002 (<code>src/pages/customer/…</code>); the spec leaves the file name to SPEC-002 on purpose.</p>
 </div>
