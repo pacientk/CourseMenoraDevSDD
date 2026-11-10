@@ -1,7 +1,7 @@
 import { he } from '@/shared/i18n/he'
 
-// Заглушка стартового репозитория. Каркас приложения (шапка, навигация, маршруты)
-// появится при исполнении SPEC-001 — см. docs/specs/SPEC-001-app-shell/spec.md.
+// Starter placeholder. The application shell (header, navigation, routes)
+// arrives with SPEC-001 — see docs/specs/SPEC-001-app-shell/spec.md.
 export function App() {
   return (
     <main>

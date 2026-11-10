@@ -3,8 +3,8 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { fileURLToPath } from 'node:url'
 import type { Plugin } from 'vite'
 
-// Локальная копия двух эндпоинтов DummyJSON для офлайн-режима.
-// Форма ответов совпадает с настоящим API, включая «лишние» чувствительные поля.
+// Local copy of two DummyJSON endpoints for offline mode.
+// Response shapes match the real API, including the "extra" sensitive fields.
 
 const PREFIX = '/mock-api'
 const USER_ROUTE = /^\/users\/(\d+)$/

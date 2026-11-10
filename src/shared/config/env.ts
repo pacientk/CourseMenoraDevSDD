@@ -1,5 +1,5 @@
-// Единственная точка чтения переменных окружения. Проверка при старте:
-// приложение не должно молча работать с пустым или «кривым» адресом API.
+// The only place that reads environment variables. Checked at start-up:
+// the app must not silently run with an empty or malformed API address.
 function readApiBaseUrl(): string {
   const value: unknown = import.meta.env.VITE_API_BASE_URL
   if (typeof value !== 'string' || value.trim() === '') {

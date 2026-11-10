@@ -1,12 +1,14 @@
 # Menora · SDD Workshop
 
-Стартовый репозиторий курса «Spec-Driven Development на практике». За одну встречу
-проходим полный цикл разработки страницы «תמונת לקוח 360» — от спеки до собранного
-приложения — с агентами и гейтами на каждом этапе.
+Starter repository for the workshop "Spec-Driven Development in practice". In one meeting
+we walk the full development cycle of the page «תמונת לקוח 360» (Customer 360) — from spec
+to built application — with agents and gates at every stage, using GitHub Copilot in
+VS Code.
 
-## До встречи (10 минут)
+## Before the meeting (10 minutes)
 
-Нужно: **Node.js 22.12+**, **Git**, **Claude Code** с выполненным входом.
+You need **Node.js 22.12+**, **Git**, **VS Code** with the **GitHub Copilot** and
+**GitHub Copilot Chat** extensions, signed in to GitHub. Windows and macOS both work.
 
 ```sh
 git clone https://github.com/pacientk/CourseMenoraDevSDD.git
@@ -15,51 +17,57 @@ npm install
 npm run doctor
 ```
 
-`npm run doctor` проверяет машину и говорит, что исправить. Строки `[INFO]` про агента
-и плагин — нормальны: это шаги встречи.
+`npm run doctor` checks the machine and says what to fix. An `[INFO]` line about the
+`react-engineer` agent is expected: we create it during the meeting.
 
-## На встрече
+## During the meeting
 
-Откройте `workshop/PROMPTS.md` — там все команды и промпты по шагам, с запасным
-вариантом на каждый шаг.
+Open `workshop/prompts.html` in a browser — every command and prompt, step by step, with
+a fallback for each step and a Windows / macOS switch.
 
-## Что где лежит
+## What is where
 
 ```
-CLAUDE.md                     правила проекта для агентов и людей
+AGENTS.md                       project rules for agents and people
+.github/
+  copilot-instructions.md       points Copilot at AGENTS.md
+  skills/sdd/                   the Spec-Driven Development skill and document templates
+  agents/code-reviewer.agent.md independent read-only reviewer
+  agents/                       the react-engineer agent is created here during the meeting
+  prompts/                      /review and /security-review
+.vscode/settings.json           pre-approved terminal commands for Copilot agent mode
 docs/
-  architecture/conventions.md конвенции: слои, компоненты, данные, безопасность, тесты
-  design/                     скриншот и разметка целевой страницы
-  specs/SPEC-001-app-shell/   первая спека — уже написана и утверждена
-.claude/
-  skills/sdd/                 скилл Spec-Driven Development и шаблоны документов
-  agents/                     сюда на встрече создадим агента react-engineer
-  settings.json               разрешения для команд гейтов
-tools/claude-marketplace/     маркетплейс с плагином независимого ревьюера
+  architecture/conventions.md   conventions: layers, components, data, security, tests
+  design/                       screenshot and markup of the target page
+  specs/SPEC-001-app-shell/     the first spec — already written and approved
+tools/reviewer/                 reviewer references and scripts (context, hotspots)
 workshop/
-  PROMPTS.md                  все промпты встречи
-  briefs/                     вводные от продукта для SPEC-002 и SPEC-003
-  reference/rn-engineer.md    образец агента, по которому создаём своего
-  fallback/                   готовые агенты на случай, если что-то не получилось
-  golden/                     эталонные документы SPEC-002
-src/                          приложение: app · pages · widgets · entities · shared
-mocks/                        офлайн-копия API
+  prompts.html                  all prompts of the meeting
+  START.html                    guide for a test participant (dry run)
+  briefs/                       product briefs for SPEC-002 and SPEC-003
+  reference/                    the agent pattern we create our own agent from
+  fallback/                     ready-made agent in case something goes wrong
+  golden/                       reference documents for SPEC-002
+scripts/                        doctor, catchup, spec-lint
+src/                            the app: app · pages · widgets · entities · shared
+mocks/                          offline copy of the API
 ```
 
-## Команды
+## Commands
 
-| Что | Команда |
+| What | Command |
 |---|---|
-| Запуск | `npm run dev` |
-| Запуск без доступа к API | `npm run dev:offline` |
-| Все гейты: типы → линт → тесты | `npm run validate` |
-| Релизная проверка: validate → audit → build | `npm run release:check` |
-| Собрать и открыть как на сервере | `npm run build && npm run preview` |
-| Проверка машины | `npm run doctor` |
-| Догнать группу с готовой контрольной точки | `npm run catchup` |
+| Run | `npm run dev` |
+| Run without access to the API | `npm run dev:offline` |
+| All gates: types → lint → tests | `npm run validate` |
+| Release check: validate → audit → build | `npm run release:check` |
+| Build and open as on the server | `npm run build`, then `npm run preview` |
+| Check the machine | `npm run doctor` |
+| Catch up with the group from a checkpoint | `npm run catchup` |
+| Check a spec for unfilled template slots | `npm run spec:lint -- <file>` |
 
-## После встречи
+## After the meeting
 
-- Самостоятельное задание: `workshop/briefs/SPEC-003-customer-search.md`.
-- Скилл `sdd` — учебная выжимка. Что в нём упрощено относительно полной версии,
-  написано в конце `.claude/skills/sdd/SKILL.md`.
+- Self-study assignment: `workshop/briefs/SPEC-003-customer-search.md`.
+- The `sdd` skill is a workshop extract. What is simplified compared with the full
+  version is listed at the end of `.github/skills/sdd/SKILL.md`.

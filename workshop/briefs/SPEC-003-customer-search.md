@@ -1,39 +1,39 @@
-# Бриф — поиск другого клиента
+# Brief — search for another customer
 
-Задание для самостоятельной работы после встречи. Пройдите полный цикл: спека →
-утверждение → исполнение → независимое ревью → security → закрытие.
+A self-study assignment after the session. Go through the full cycle: spec →
+approval → execution → independent review → security → close.
 
-## Зачем
+## Why
 
-Сотрудник заканчивает один звонок и принимает следующий. Ему нужно перейти к другому
-клиенту, не редактируя адрес страницы руками.
+An employee finishes one call and takes the next. They need to move to another
+customer without editing the page address by hand.
 
-## Что нужно
+## What is needed
 
-В карточке клиента — поле «חיפוש לקוח אחר». Сотрудник вводит имя, видит список
-совпадений и по выбору попадает на страницу выбранного клиента. Блок поиска — на
-скриншоте `docs/design/customer-360.png`, справа от данных клиента.
+In the customer card — a «חיפוש לקוח אחר» field. The employee types a name, sees a list
+of matches, and on selection lands on the selected customer's page. The search block is on
+the screenshot `docs/design/customer-360.png`, to the right of the customer details.
 
-## Откуда данные
+## Where the data comes from
 
-`GET /users/search?q={текст}` → `{ users: [{ id, firstName, lastName, … }], total, skip, limit }`.
-В ответе те же чувствительные поля, что и в профиле.
+`GET /users/search?q={text}` → `{ users: [{ id, firstName, lastName, … }], total, skip, limit }`.
+The response has the same sensitive fields as the profile.
 
-Офлайн-копия API (`npm run dev:offline`) этот адрес пока не обслуживает — решите в
-спеке, входит ли его добавление в границы.
+The offline copy of the API (`npm run dev:offline`) does not serve this address yet — decide in the
+spec whether adding it is in scope.
 
-## Как должно себя вести
+## How it should behave
 
-- Запрос уходит не на каждое нажатие клавиши, а после паузы во вводе.
-- Меньше двух символов — запрос не уходит.
-- Нет совпадений — сообщение «לא נמצאו לקוחות».
-- Ошибка запроса — сообщение об ошибке; уже показанная карточка клиента не страдает.
-- Быстрый ввод: поздний ответ по старому тексту не перезаписывает свежий.
-- Список управляется с клавиатуры.
+- The request is sent not on every keystroke, but after a pause in typing.
+- Fewer than two characters — no request is sent.
+- No matches — the message «לא נמצאו לקוחות».
+- Request error — an error message; the customer card already shown is not affected.
+- Fast typing: a late response for the old text does not overwrite the fresh one.
+- The list is keyboard-operable.
 
-## Подсказки к спеке
+## Hints for the spec
 
-- Какой трек: small spec или full? Обоснуйте в гейте G0.
-- Что из SPEC-002 переиспользуется без изменений?
-- Какие критерии приёмки здесь про безопасность?
-- Что явно «не входит»?
+- Which track: small spec or full? Justify it in gate G0.
+- What from SPEC-002 is reused without changes?
+- Which acceptance criteria here are about security?
+- What is explicitly "out of scope"?

@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDD Workshop — Prompts</title>
+<style>
+:root {
+  --bg: #F4F3F9; --surface: #FFFFFF; --ink: #23233A; --ink-2: #4E4D66; --ink-3: #77768E;
+  --line: #D9D8EA; --accent: #6436DF; --accent-soft: #ECE7FF; --hi: #FFC700; --hi-soft: #FFF3C2;
+  --code-bg: #1B1A2E; --code-fg: #EDEBFA; --ok: #1F9D6A; --ok-soft: #DFF5EA;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17152A; --surface: #211E38; --ink: #F1F0FA; --ink-2: #C6C4DC; --ink-3: #9997B4;
+    --line: #37345A; --accent: #B39BFF; --accent-soft: #2E2752; --hi-soft: #40350B;
+    --code-bg: #0F0E1C; --ok-soft: #10311F;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.5; }
+.wrap { max-width: 60em; margin: 0 auto; padding: 1.5em 16px 5em; }
+header { display: flex; flex-wrap: wrap; gap: 1em; align-items: center; justify-content: space-between; margin-bottom: 1.5em; }
+h1 { font-size: 1.6em; margin: 0; }
+h2 { font-size: 1.3em; margin: 2.2em 0 .6em; padding-top: 1.2em; border-top: 1px solid var(--line); }
+h3 { font-size: 1em; margin: 1.4em 0 .4em; color: var(--ink-2); }
+p, li { color: var(--ink-2); }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: .92em; background: var(--accent-soft); padding: .08em .35em; border-radius: .3em; }
+pre { position: relative; margin: .6em 0 1em; padding: .9em 7.5em .9em 1em; background: var(--code-bg); color: var(--code-fg); border-radius: .6em; font-family: var(--mono); font-size: .88em; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+pre code { background: none; padding: 0; font-size: 1em; color: inherit; }
+.copy { position: absolute; top: .6em; inset-inline-end: .6em; padding: .25em .7em; border: 1px solid var(--line); border-radius: .4em; background: var(--surface); color: var(--ink); font: inherit; font-family: var(--sans); font-size: .85em; cursor: pointer; }
+.copy.is-done { border-color: var(--ok); color: var(--ok); }
+.label { display: inline-block; margin: 1em 0 .2em; padding: .15em .6em; border-radius: 99em; font-size: .78em; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.label.term { background: var(--hi-soft); color: var(--ink); }
+.label.chat { background: var(--accent-soft); color: var(--accent); }
+.note { margin: .8em 0; padding: .7em .9em; border-inline-start: 3px solid var(--accent); background: var(--surface); border-radius: .4em; }
+.fallback { margin-top: 1.4em; padding: 1em; border: 1px dashed var(--line); border-radius: .6em; background: var(--surface); }
+.fallback h3 { margin-top: 0; }
+table { border-collapse: collapse; width: 100%; margin: .8em 0; font-size: .95em; }
+th, td { padding: .45em .6em; border-bottom: 1px solid var(--line); text-align: start; vertical-align: top; color: var(--ink-2); }
+th { color: var(--ink-3); font-size: .85em; text-transform: uppercase; letter-spacing: .04em; }
+td:first-child { color: var(--ink); font-weight: 600; }
+.toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 99em; overflow: hidden; background: var(--surface); }
+.toggle button { padding: .4em 1em; border: 0; background: none; color: var(--ink-2); font: inherit; cursor: pointer; }
+.toggle button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+body[data-os="win"] [data-os="mac"], body[data-os="mac"] [data-os="win"] { display: none; }
+kbd { font-family: var(--mono); font-size: .85em; padding: .05em .4em; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: .3em; background: var(--surface); }
+nav.toc { display: flex; flex-wrap: wrap; gap: .4em .9em; margin: 0 0 1em; font-size: .92em; }
+.small { font-size: .9em; color: var(--ink-3); }
+@media print { .copy, .toggle { display: none; } pre { white-space: pre-wrap; } }
+</style>
+</head>
+<body data-os="win">
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>SDD Workshop — prompts to copy and paste</h1>
+    <p class="small">Every command and prompt of the meeting, step by step. <span class="label term">Terminal</span> blocks run in the VS Code terminal; <span class="label chat">Copilot Chat</span> blocks are pasted into the Copilot Chat panel in <strong>Agent</strong> mode.</p>
+  </div>
+  <div class="toggle" role="group" aria-label="Operating system">
+    <button type="button" data-set-os="win" aria-pressed="true">Windows</button>
+    <button type="button" data-set-os="mac" aria-pressed="false">macOS</button>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#catchup">Catch up</a> · <a href="#step0">Step 0</a> · <a href="#step1">Step 1</a> · <a href="#step2">Step 2</a> · <a href="#step3">Step 3</a> · <a href="#step4">Step 4</a> · <a href="#step5">Step 5</a> · <a href="#step6">Step 6</a> · <a href="#step7">Step 7</a> · <a href="#step8">Step 8</a> · <a href="#cheatsheet">Cheat sheet</a>
+</nav>
+
+<div class="note">
+  <strong>Working with Copilot during the workshop.</strong>
+  Open Copilot Chat with <kbd data-os="win">Ctrl+Alt+I</kbd><kbd data-os="mac">⌃⌘I</kbd>, pick <strong>Agent</strong> in the mode dropdown, and start a <strong>new chat</strong> at every step marked "new chat".
+  When Copilot asks to run a terminal command, read it and press <em>Allow</em> — the gate and git commands are pre-approved in <code>.vscode/settings.json</code>, anything else is worth a glance.
+  Edited files appear as pending changes: press <em>Keep</em> after you have looked at them.
+  Fell behind or something broke? Every step ends with an "If it did not work" box.
+</div>
+
+<h2 id="catchup">Catch up with the group</h2>
+<p>Far behind — jump to the finished state of the project after the step you need.</p>
+<span class="label term">Terminal</span>
+<pre data-copy>npm run catchup</pre>
+<pre data-copy>npm run catchup -- 4</pre>
+<table>
+  <thead><tr><th>Checkpoint</th><th>State</th><th>Continue from</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td><code>react-engineer</code> agent created</td><td>step 3</td></tr>
+    <tr><td>2</td><td>SPEC-001 closed and merged into <code>main</code></td><td>step 4</td></tr>
+    <tr><td>3</td><td>SPEC-002: epic approved, tasks and plan ready</td><td>step 5, wave 1</td></tr>
+    <tr><td>4</td><td>Wave 1 done</td><td>step 5, wave 2</td></tr>
+    <tr><td>5</td><td>Wave 2 done</td><td>step 5, wave 3</td></tr>
+    <tr><td>6</td><td>Wave 3 done, the page works</td><td>step 6</td></tr>
+    <tr><td>7</td><td>Review passed, findings fixed</td><td>step 7</td></tr>
+    <tr><td>8</td><td>SPEC-002 closed and merged into <code>main</code></td><td>—</td></tr>
+  </tbody>
+</table>
+<p>Your work is not lost: the command saves it on a <code>backup/…</code> branch and, if there were uncommitted changes, in <code>git stash</code>. After a jump, start a new Copilot chat.</p>
+
+<h2 id="step0">Step 0 — Before the meeting</h2>
+<span class="label term">Terminal</span>
+<pre data-copy>git clone https://github.com/pacientk/CourseMenoraDevSDD.git</pre>
+<pre data-copy>cd CourseMenoraDevSDD</pre>
+<pre data-copy>npm install</pre>
+<pre data-copy>npm run doctor</pre>
+<p><code>npm run doctor</code> must end with <strong>Ready</strong>. An <code>[INFO]</code> line about the <code>react-engineer</code> agent is expected: we create it during the meeting. A <code>[WARN]</code> about the API means your network blocks <code>dummyjson.com</code> — the project has an offline copy, you will use <code>npm run dev:offline</code>.</p>
+<p>Then open the project in VS Code:</p>
+<pre data-copy>code .</pre>
+<p>VS Code will ask whether you trust the folder — choose <em>Yes, I trust the authors</em>; agents, skills and prompt files do not load in restricted mode. Accept the recommended extensions (GitHub Copilot, GitHub Copilot Chat) if prompted, and sign in to GitHub.</p>
+
+<h2 id="step1">Step 1 — Start Copilot, check the agents and the skill</h2>
+<p>Open Copilot Chat (<kbd data-os="win">Ctrl+Alt+I</kbd><kbd data-os="mac">⌃⌘I</kbd>) and select <strong>Agent</strong> mode. Type <code>/</code> in the input: the list must contain <code>/sdd</code>, <code>/review</code> and <code>/security-review</code>. Open the agent dropdown: it must contain <code>code-reviewer</code>. Everything came with the repository — <code>.github/skills/</code>, <code>.github/agents/</code>, <code>.github/prompts/</code>.</p>
+<span class="label chat">Copilot Chat</span> — getting to know the project
+<pre data-copy>Read AGENTS.md, docs/architecture/conventions.md and .github/skills/sdd/SKILL.md.
+Answer briefly, as a list:
+1) which gates the project has and which command closes each one;
+2) who writes the code, who checks it, and why these are different roles;
+3) what you must do if asked to write code without an approved spec.
+Change nothing.</pre>
+<div class="fallback">
+  <h3>If it did not work</h3>
+  <p><code>/sdd</code> is not in the list — run <em>Developer: Reload Window</em> from the Command Palette (<kbd data-os="win">Ctrl+Shift+P</kbd><kbd data-os="mac">⇧⌘P</kbd>) and check that the folder is trusted (<em>Manage Workspace Trust</em>). Still missing — type the prompt in plain words instead of the slash command: "Use the sdd skill: run SPEC-001 with --commit". The skill is picked up by its description.</p>
+  <p>No <strong>Agent</strong> mode in the dropdown — update VS Code and the Copilot Chat extension; agent mode needs a current version.</p>
+</div>
+
+<h2 id="step2">Step 2 — Create the implementer agent by analogy</h2>
+<p>We have a finished agent for React Native: <code>workshop/reference/rn-engineer.agent.md</code>. We ask Copilot to produce an agent for this project after its pattern.</p>
+<span class="label chat">Copilot Chat</span> — new chat
+<pre data-copy>Create an implementer agent for this project after the pattern of an existing one.
+
+Pattern: workshop/reference/rn-engineer.agent.md — an agent for React Native that
+works with the standards kit in standards/ and a project profile.
+
+Needed: .github/agents/react-engineer.agent.md — an agent for this project (React
+web, Vite, TypeScript, Vitest).
+
+Keep from the pattern:
+- the structure of steps 0–4: load the rules → methodology gate → implement →
+  Definition of Done → hand-off;
+- the frontmatter format (name, description, tools);
+- the prohibitions: never weaken a rule to get green, never skip a gate silently,
+  never fix what is outside the task's scope;
+- the handling of review findings with IDs F-1, F-2.
+
+Replace:
+- the rule sources in step 0: instead of standards/ and PROJECT-PROFILE — this
+  project's AGENTS.md and docs/architecture/conventions.md, plus docs/design/README.md;
+- the React Native rules in step 2 — with the rules from
+  docs/architecture/conventions.md tagged [Review]: what lint does not catch;
+- the gates in step 3 — with the commands from the table in AGENTS.md;
+- the hand-off format — with the template .github/skills/sdd/templates/handoff.md.
+
+Remove: everything about React Native, simulators, themes.
+
+Add:
+- to step 1: the agent changes files only within the Scope paths of its task and
+  never edits plan.md or review.log.md;
+- to step 3: the parallel-wave rule — run tests only for its own paths, do not fix
+  errors in other tasks' files, report them in the hand-off;
+- to step 2: files are created and edited with the editor tools, not through the
+  terminal, and only terminal commands that work in both PowerShell and zsh are used.
+
+Frontmatter: name: react-engineer, tools: ['read', 'search', 'edit', 'execute'].
+Write in English. First show a table "taken from the pattern / replaced / removed",
+then write the file right away — do not wait for confirmation.</pre>
+<p>Copilot shows the new file as a pending change — read the frontmatter and step 2, then press <em>Keep</em>. Check: open the agent dropdown in Copilot Chat; <code>react-engineer</code> must be there (if not, reload the window).</p>
+<span class="label chat">Copilot Chat</span> — the agent is now part of the project
+<pre data-copy>Commit the new agent on main with the message: chore: add react-engineer agent</pre>
+<div class="fallback">
+  <h3>If it did not work</h3>
+  <span class="label term">Terminal</span>
+  <pre data-os="win" data-copy>Copy-Item workshop\fallback\agents\react-engineer.agent.md .github\agents\react-engineer.agent.md</pre>
+  <pre data-os="mac" data-copy>cp workshop/fallback/agents/react-engineer.agent.md .github/agents/react-engineer.agent.md</pre>
+</div>
+
+<h2 id="step3">Step 3 — SPEC-001: a small spec from reading to a working page</h2>
+<p>The spec is already written and approved: <code>docs/specs/SPEC-001-app-shell/spec.md</code>. Open it and read sections 3, 4 and 5 — goal, scope, acceptance criteria.</p>
+<span class="label chat">Copilot Chat</span> — new chat, execution (gate G4)
+<pre data-copy>/sdd run SPEC-001 --commit</pre>
+<p>While the agent works, we look at the anatomy of a spec on the slide. The orchestrator launches <code>react-engineer</code> as a subagent, then re-runs <code>npm run validate</code> itself.</p>
+<span class="label term">Terminal</span> — second terminal, check in the browser
+<pre data-copy>npm run dev</pre>
+<p>Open <a href="http://localhost:5173">http://localhost:5173</a>: the address must change to <code>/customers/1</code>, the header shows three menu items. Stop the server with <kbd>Ctrl+C</kbd> when done.</p>
+<span class="label chat">Copilot Chat</span> — where are we
+<pre data-copy>/sdd status</pre>
+<span class="label chat">Copilot Chat</span> — close SPEC-001 and return to main
+<pre data-copy>SPEC-001 has been checked in the browser. Close it the short way: set status done in
+spec.md, add a line to the "Execution log" and an entry to docs/release-notes.md,
+commit, then switch to main and merge the branch spec/001-app-shell with --no-ff.
+We skip the independent review and the security gate for this spec during the
+workshop — record that in the "Execution log" in one line with the reason
+"time budget of the meeting".</pre>
+<div class="fallback">
+  <h3>If it did not work</h3>
+  <p>The agent is stuck, or the gate stays red after two attempts:</p>
+  <pre data-copy>Stop working on SPEC-001. Show the output of npm run validate and explain the first
+error. Fix nothing until I answer.</pre>
+  <p>Subagents are not available in your session (the orchestrator printed the task prompt instead of running it): open a new chat, select the <code>react-engineer</code> agent in the dropdown, paste that prompt, then come back and run <code>/sdd run SPEC-001 --commit</code> again so the orchestrator checks the gate and commits.</p>
+</div>
+
+<h2 id="step4">Step 4 — SPEC-002: epic → tasks → plan</h2>
+<p>The product brief is in <code>workshop/briefs/SPEC-002-customer-profile.md</code>. Read it: this is raw material, not a spec.</p>
+<span class="label chat">Copilot Chat</span> — new chat, the epic (gate G0 → G1)
+<pre data-copy>/sdd epic customer-profile
+
+Brief: workshop/briefs/SPEC-002-customer-profile.md
+Design: docs/design/customer-360.png and docs/design/README.md
+Spec number: SPEC-002.
+Do not ask clarifying questions: whatever the brief lacks goes to "Open questions".
+After writing the file, show the self-check table and the list of acceptance criteria.</pre>
+<p><strong>Check the epic — 3 minutes, this is gate G1.</strong> Open <code>docs/specs/SPEC-002-customer-profile/epic.md</code> and answer four questions for yourself:</p>
+<ol>
+  <li>Can you say "met" or "not met" for every acceptance criterion?</li>
+  <li>Is there a criterion that <code>password</code>, <code>ssn</code>, <code>bank</code> never reach the screen?</li>
+  <li>Are there criteria for loading, error, "not found" and an empty list?</li>
+  <li>Is the "Out of scope" section non-empty?</li>
+</ol>
+<p>All good — replace <code>draft</code> with <code>approved</code> in the Meta table <strong>yourself</strong> and save the file. Something off — ask Copilot to fix that specific point and check again.</p>
+<span class="label chat">Copilot Chat</span> — tasks (gate G2)
+<pre data-copy>/sdd tasks SPEC-002
+
+No more than five tasks. The data layer and the shared UI elements must run in
+parallel; the widgets in parallel at the next step; the page assembly last.
+Only one task edits the shared string dictionary src/shared/i18n/he.ts.</pre>
+<p>Look at the task index and the graph: do you agree with the breakdown?</p>
+<span class="label chat">Copilot Chat</span> — plan (gate G3)
+<pre data-copy>/sdd plan SPEC-002</pre>
+<span class="label chat">Copilot Chat</span> — record the documents
+<pre data-copy>Create the branch spec/002-customer-profile and commit the spec documents with the
+message: docs(SPEC-002): epic, tasks, plan</pre>
+<div class="fallback">
+  <h3>If it did not work</h3>
+  <p>The epic or the tasks came out weak and the clock is running — take the reference documents:</p>
+  <span class="label term">Terminal</span>
+  <pre data-os="win" data-copy>Copy-Item -Recurse workshop\golden\SPEC-002-customer-profile docs\specs\SPEC-002-customer-profile</pre>
+  <pre data-os="mac" data-copy>cp -r workshop/golden/SPEC-002-customer-profile docs/specs/SPEC-002-customer-profile</pre>
+  <p>The reference epic is in status <code>draft</code>: read the acceptance criteria and approve it yourself — gate G1 still applies.</p>
+</div>
+
+<h2 id="step5">Step 5 — Execution in waves</h2>
+<span class="label chat">Copilot Chat</span> — new chat, wave 1
+<pre data-copy>/sdd run SPEC-002 --commit</pre>
+<p>The agents work in parallel where the harness allows it, one subagent per task. When the orchestrator stops, read its report: what was done, the gate result, what comes next.</p>
+<span class="label chat">Copilot Chat</span> — wave 2
+<pre data-copy>/sdd run SPEC-002 --commit</pre>
+<span class="label chat">Copilot Chat</span> — wave 3
+<pre data-copy>/sdd run SPEC-002 --commit</pre>
+<span class="label term">Terminal</span> — second terminal
+<pre data-copy>npm run dev</pre>
+<p>Check <code>/customers/1</code>, <code>/customers/2</code>, <code>/customers/9999</code>, <code>/customers/abc</code>.</p>
+<p>No access to the API from your network — stop the server and start the offline copy:</p>
+<pre data-copy>npm run dev:offline</pre>
+<div class="fallback">
+  <h3>If it did not work</h3>
+  <p>One of the tasks is marked <code>blocked</code>:</p>
+  <pre data-copy>For the blocked task show: what exactly failed, the command output and your proposal.
+Do not change the code.</pre>
+  <p>Subagents are not available: for every task prompt the orchestrator printed, open a new chat with the <code>react-engineer</code> agent selected and paste it — one task after another — then run <code>/sdd run SPEC-002 --commit</code> again to close the wave.</p>
+</div>
+
+<h2 id="step6">Step 6 — Independent review and the fix loop</h2>
+<span class="label chat">Copilot Chat</span> — new chat, round 1 (gate G5). The reviewer runs as the <code>code-reviewer</code> agent, has no editing tools and changes nothing in the project.
+<pre data-copy>/review task: docs/specs/SPEC-002-customer-profile/epic.md</pre>
+<p>Read the report: the verdict, the acceptance-criteria table, the findings <code>F-1…</code>.</p>
+<span class="label chat">Copilot Chat</span> — fixes from the report (same chat, so the orchestrator sees it)
+<pre data-copy>/sdd fix SPEC-002</pre>
+<p>The orchestrator records the round in <code>review.log.md</code>, passes the findings to the <code>react-engineer</code> agent, re-runs the gate and prints the ready re-review command.</p>
+<span class="label chat">Copilot Chat</span> — round 2 (use the command <code>/sdd fix</code> printed; usually this one)
+<pre data-copy>/review re-review: previous findings — docs/specs/SPEC-002-customer-profile/review.log.md, round 1; task: docs/specs/SPEC-002-customer-profile/epic.md</pre>
+<span class="label chat">Copilot Chat</span> — record the result of round 2
+<pre data-copy>/sdd fix SPEC-002</pre>
+<p>Verdict <code>APPROVED</code> — the gate is closed. <code>CHANGES REQUESTED</code> again — the two-round limit is exhausted: the orchestrator stops and asks you for a decision. That is the correct behaviour.</p>
+<span class="label chat">Copilot Chat</span> — record
+<pre data-copy>Commit the review fixes with the message: fix(SPEC-002): review round 1 findings</pre>
+<div class="fallback">
+  <h3>If it did not work</h3>
+  <p><code>/review</code> is not in the list — select the <code>code-reviewer</code> agent in the agent dropdown and paste:</p>
+  <pre data-copy>Review the current branch against main, including uncommitted changes.
+Task: docs/specs/SPEC-002-customer-profile/epic.md.
+Follow your instructions from Step 0 and report in the format from
+tools/reviewer/references/report-format.md.</pre>
+</div>
+
+<h2 id="step7">Step 7 — Security, build, "deploy"</h2>
+<span class="label chat">Copilot Chat</span> — new chat, security review of the branch (gate G6)
+<pre data-copy>/security-review</pre>
+<span class="label chat">Copilot Chat</span> — record the result and close the spec (gates G7 and G8)
+<pre data-copy>/sdd close SPEC-002
+
+Take the /security-review result from this conversation and record it in review.log.md.</pre>
+<span class="label term">Terminal</span> — "deploy": the built application, as it would go to the server (gate G9)
+<pre data-copy>npm run build</pre>
+<pre data-copy>npm run preview</pre>
+<p>Open the address from the output (<a href="http://localhost:4173">http://localhost:4173</a>) and walk through the manual checklist from the <code>/sdd close</code> report. Without network: <code>npm run preview:offline</code>.</p>
+<span class="label chat">Copilot Chat</span> — merge
+<pre data-copy>Commit the spec closure with the message: docs(SPEC-002): close, release notes.
+Then switch to main and merge the branch spec/002-customer-profile with --no-ff. Do not push.</pre>
+<span class="label chat">Copilot Chat</span> — what is left in the repository
+<pre data-copy>/sdd status</pre>
+<div class="fallback">
+  <h3>If it did not work</h3>
+  <p><code>/security-review</code> is not in the list — select the <code>code-reviewer</code> agent and paste:</p>
+  <pre data-copy>Run a security review of the branch spec/002-customer-profile against main.
+Check against docs/architecture/conventions.md § 7 and
+tools/reviewer/references/security-checklist.md: the allowlist of API response fields,
+no personal data in logs, validation of the identifier and the image URL, no
+dangerouslySetInnerHTML or eval, no secrets in the repository. Run npm run audit:deps.
+For every finding give the file, the line, the attack scenario and the severity.
+Do not change the code.</pre>
+</div>
+
+<h2 id="step8">Step 8 — On your own after the meeting: SPEC-003</h2>
+<p>Searching for another customer. Brief: <code>workshop/briefs/SPEC-003-customer-search.md</code>. Walk the full cycle yourself — and this time do not skip the review for the small spec.</p>
+<span class="label chat">Copilot Chat</span>
+<pre data-copy>/sdd small customer-search
+
+Brief: workshop/briefs/SPEC-003-customer-search.md</pre>
+
+<h2 id="cheatsheet">Cheat sheet</h2>
+<table>
+  <thead><tr><th>What</th><th>Command</th></tr></thead>
+  <tbody>
+    <tr><td>Where are we</td><td><code>/sdd status</code></td></tr>
+    <tr><td>Create a small spec</td><td><code>/sdd small &lt;slug&gt;</code> + brief</td></tr>
+    <tr><td>Create an epic</td><td><code>/sdd epic &lt;slug&gt;</code> + brief</td></tr>
+    <tr><td>Tasks / plan</td><td><code>/sdd tasks SPEC-NNN</code> · <code>/sdd plan SPEC-NNN</code></td></tr>
+    <tr><td>Execute (one wave per call)</td><td><code>/sdd run SPEC-NNN --commit</code></td></tr>
+    <tr><td>Independent review</td><td><code>/review task: &lt;spec path&gt;</code></td></tr>
+    <tr><td>Fix from the report</td><td><code>/sdd fix SPEC-NNN</code></td></tr>
+    <tr><td>Security</td><td><code>/security-review</code></td></tr>
+    <tr><td>Close the spec</td><td><code>/sdd close SPEC-NNN</code></td></tr>
+    <tr><td>All gates locally</td><td><code>npm run validate</code> · <code>npm run release:check</code></td></tr>
+    <tr><td>Catch up with the group</td><td><code>npm run catchup</code></td></tr>
+    <tr><td>Open Copilot Chat</td><td><kbd data-os="win">Ctrl+Alt+I</kbd><kbd data-os="mac">⌃⌘I</kbd></td></tr>
+    <tr><td>Command Palette</td><td><kbd data-os="win">Ctrl+Shift+P</kbd><kbd data-os="mac">⇧⌘P</kbd></td></tr>
+    <tr><td>Toggle terminal</td><td><kbd data-os="win">Ctrl+`</kbd><kbd data-os="mac">⌃`</kbd></td></tr>
+  </tbody>
+</table>
+
+</div>
+<script>
+(function () {
+  const KEY = 'sdd-workshop-os';
+  const body = document.body;
+  function setOs(os, persist) {
+    body.dataset.os = os;
+    document.querySelectorAll('[data-set-os]').forEach((button) => {
+      button.setAttribute('aria-pressed', String(button.dataset.setOs === os));
+    });
+    if (persist) { try { localStorage.setItem(KEY, os); } catch (_) { /* private mode */ } }
+  }
+  let initial = null;
+  try { initial = localStorage.getItem(KEY); } catch (_) { /* private mode */ }
+  if (initial !== 'win' && initial !== 'mac') {
+    initial = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? 'mac' : 'win';
+  }
+  setOs(initial, false);
+  document.querySelectorAll('[data-set-os]').forEach((button) => {
+    button.addEventListener('click', () => setOs(button.dataset.setOs, true));
+  });
+
+  document.querySelectorAll('pre[data-copy]').forEach((pre) => {
+    const text = pre.textContent;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy';
+    button.textContent = 'Copy';
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = 'Copied';
+        button.classList.add('is-done');
+        setTimeout(() => { button.textContent = 'Copy'; button.classList.remove('is-done'); }, 1500);
+      } catch (_) {
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    });
+    pre.appendChild(button);
+  });
+})();
+</script>
+</body>
+</html>

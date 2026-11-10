@@ -1,5 +1,5 @@
-# G8 — те же проверки, что агент и разработчик запускают локально, но на сервере.
-# Порядок фиксирован: типы → линт → тесты → аудит → сборка.
+# G8 — the same checks the agent and the developer run locally, on the server.
+# Fixed order: types → lint → tests → audit → build.
 name: CI
 
 on:

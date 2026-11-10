@@ -3,8 +3,8 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 import { mockApiPlugin } from './mocks/mockApiPlugin.ts'
 
-// Офлайн-режим (`npm run dev:offline`) поднимает локальную копию API под /mock-api —
-// на случай, когда корпоративная сеть не пускает к https://dummyjson.com.
+// Offline mode (`npm run dev:offline`) serves a local copy of the API under /mock-api —
+// for when the corporate network blocks https://dummyjson.com.
 export default defineConfig(({ mode }) => ({
   plugins: [react(), ...(mode === 'offline' ? [mockApiPlugin()] : [])],
   resolve: {

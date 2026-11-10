@@ -20,7 +20,8 @@
     "audit:deps": "npm audit --audit-level=high",
     "release:check": "npm run validate && npm run audit:deps && npm run build",
     "doctor": "node scripts/doctor.mjs",
-    "catchup": "node scripts/catchup.mjs"
+    "catchup": "node scripts/catchup.mjs",
+    "spec:lint": "node scripts/spec-lint.mjs"
   },
   "dependencies": {
     "react": "^19.3.1",

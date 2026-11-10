@@ -1,147 +1,147 @@
-# Конвенции проекта
+# Project conventions
 
-Короткий профиль проекта: то, что обязан знать исполнитель и по чему проверяет
-ревьюер. Идентификаторы правил (`react.ui.tokens` и т. п.) — из инженерного набора
-стандартов; здесь они нужны, чтобы замечание ревью ссылалось на конкретное правило.
+A short project profile: what the implementer must know and what the reviewer checks
+against. Rule identifiers (`react.ui.tokens` and the like) come from the engineering
+standards kit; they are here so that a review finding can point at a specific rule.
 
-Метка в скобках говорит, кто ловит нарушение: **[TS]** — компилятор, **[Lint]** —
-oxlint, **[Review]** — только ревью. Правила с меткой [Review] нарушаются чаще всего:
-автоматика их не видит.
+The tag in brackets says who catches a violation: **[TS]** — the compiler, **[Lint]** —
+oxlint, **[Review]** — review only. Rules tagged [Review] are violated most often:
+automation does not see them.
 
-## 1. Слои (Feature-Sliced Design, web)
+## 1. Layers (Feature-Sliced Design, web)
 
 ```
 src/
-├── app/        запуск: корневой компонент, роутер, провайдеры
-├── pages/      один слайс на маршрут; только композиция, без бизнес-логики
-├── widgets/    крупные самостоятельные блоки страницы (app-header, profile-card)
-├── entities/   бизнес-сущности: типы, маппинг, запросы, хуки (customer)
-└── shared/     инфраструктура без знания о домене: ui, api, config, i18n
+├── app/        bootstrap: root component, router, providers
+├── pages/      one slice per route; composition only, no business logic
+├── widgets/    large self-contained page blocks (app-header, profile-card)
+├── entities/   business entities: types, mapping, requests, hooks (customer)
+└── shared/     domain-agnostic infrastructure: ui, api, config, i18n
 ```
 
-- Импорты идут только вниз: `app → pages → widgets → entities → shared`
+- Imports go downward only: `app → pages → widgets → entities → shared`
   (`arch.fsd.downward-only`) **[Review]**.
-- Слайсы одного слоя не импортируют друг друга (`arch.fsd.no-cross-slice`) **[Review]**.
-- Снаружи слайс доступен только через свой `index.ts`
-  (`arch.fsd.public-api`) **[Review]**. Импорт между слоями — через алиас:
+- Slices of the same layer do not import each other (`arch.fsd.no-cross-slice`) **[Review]**.
+- From the outside, a slice is reachable only through its `index.ts`
+  (`arch.fsd.public-api`) **[Review]**. Imports between layers go through the alias:
   `import { ProfileCard } from '@/widgets/profile-card'`.
-- В `shared` нет слов предметной области: `Card` — да, `CustomerCard` — нет
+- No domain vocabulary in `shared`: `Card` — yes, `CustomerCard` — no
   (`arch.fsd.shared-is-business-free`) **[Review]**.
-- Запрос к серверу живёт рядом с владельцем данных: `entities/<entity>/api`
+- A server request lives next to the owner of the data: `entities/<entity>/api`
   (`arch.fsd.server-state-in-slice`) **[Review]**.
 
-Имена слайсов — `kebab-case` (`profile-card`), папки компонентов — `PascalCase`.
+Slice names are `kebab-case` (`profile-card`), component folders are `PascalCase`.
 
-## 2. Компоненты
+## 2. Components
 
-Файлы компонента лежат вместе. В слайсе с одним компонентом — прямо в папке слайса:
+A component's files live together. In a slice with a single component — directly in the slice folder:
 
 ```
 widgets/profile-card/
-├── index.ts                    единственная внешняя точка входа
+├── index.ts                    the only external entry point
 ├── ProfileCard.tsx
 ├── ProfileCard.module.css
 ├── IProfileCard.ts             IProfileCardProps
 └── __tests__/ProfileCard.test.tsx
 ```
 
-В `shared/ui` компонентов много, поэтому у каждого своя папка той же формы
-(`shared/ui/Card/…`), а `shared/ui/index.ts` реэкспортирует их все.
+`shared/ui` has many components, so each gets its own folder of the same shape
+(`shared/ui/Card/…`), and `shared/ui/index.ts` re-exports them all.
 
-- Пропсы — именованный интерфейс `I<Component>Props` в файле `I<Component>.ts`
+- Props are a named interface `I<Component>Props` in the file `I<Component>.ts`
   (`react.comp.props-file`) **[Review]**.
-- Компонент читает хук и рендерит. Вычисления и запросы — в хуках, не в теле рендера
+- A component reads a hook and renders. Computations and requests belong in hooks, not in the render body
   (`react.comp.no-logic-in-render`) **[Review]**.
-- Компонент не объявляется внутри другого компонента
+- A component is not declared inside another component
   (`react.comp.no-nested-components`) **[Lint]**.
-- Ключи списков — доменные идентификаторы, не индекс (`react.comp.stable-keys`) **[Review]**.
-- Булевы значения — с префиксом `is / has / should / can`
+- List keys are domain identifiers, not the index (`react.comp.stable-keys`) **[Review]**.
+- Booleans carry the prefix `is / has / should / can`
   (`core.naming.boolean-prefix`) **[Review]**.
-- Без `any`, без `!`, без непроверенных `as` (`core.ts.no-any`, `core.ts.no-non-null`,
+- No `any`, no `!`, no unchecked `as` (`core.ts.no-any`, `core.ts.no-non-null`,
   `core.ts.assertions`) **[TS + Review]**.
 
-## 3. Стили, токены, RTL
+## 3. Styles, design tokens, RTL
 
-- Стили — в `<Component>.module.css`. Инлайн-стиль допустим только для значения,
-  которое вычисляется на каждом рендере.
-- Цвета, отступы, радиусы, тени, размеры и начертания шрифта, ширина границы —
-  только `var(--token)` из `src/shared/ui/tokens.css`. Литерал `#6436DF` или `16px` в
-  компоненте — нарушение (`react.ui.tokens`) **[Review]**. Нужного токена нет — это
-  вопрос к спеке, а не повод вписать число.
-- У компонента без пропсов файла `I<Component>.ts` нет.
-- Направление — RTL. Только логические свойства: `margin-inline-start`,
+- Styles go in `<Component>.module.css`. An inline style is allowed only for a value
+  that is computed on every render.
+- Colors, spacing, radii, shadows, font sizes and weights, border width —
+  only `var(--token)` from `src/shared/ui/tokens.css`. A literal `#6436DF` or `16px` in
+  a component is a violation (`react.ui.tokens`) **[Review]**. If the needed token does not exist, that is
+  a question for the spec, not a reason to write in a number.
+- A component without props has no `I<Component>.ts` file.
+- Direction is RTL. Logical properties only: `margin-inline-start`,
   `padding-inline`, `inset-inline-end`, `text-align: start`. `left` / `right` /
-  `margin-left` — нарушение **[Review]**.
+  `margin-left` are a violation **[Review]**.
 
-## 4. Строки
+## 4. Strings
 
-Все пользовательские тексты — в `src/shared/i18n/he.ts`. В компонентах и тестах —
-ссылка на словарь, не литерал (`react.ui.strings`) **[Review]**. Это касается и
-`aria-label`, и текстов ошибок.
+All user-facing text lives in `src/shared/i18n/he.ts`. In components and tests —
+a reference to the dictionary, not a literal (`react.ui.strings`) **[Review]**. This also applies to
+`aria-label` and error texts.
 
-## 5. Доступность
+## 5. Accessibility
 
-- У каждого интерактивного элемента есть роль и доступное имя
+- Every interactive element has a role and an accessible name
   (`react.a11y.interactive`) **[Review]**.
-- Семантика раньше ARIA: `nav`, `main`, `header`, `h1…h3`, `button`, `a`.
-- Состояния загрузки и ошибки объявляются: `aria-busy`, `role="status"`,
+- Semantics before ARIA: `nav`, `main`, `header`, `h1…h3`, `button`, `a`.
+- Loading and error states are announced: `aria-busy`, `role="status"`,
   `role="alert"`.
-- Фокус виден (стиль уже задан в `global.css`), порядок фокуса совпадает с визуальным.
+- Focus is visible (the style is already set in `global.css`), focus order matches the visual order.
 
-## 6. Данные и состояние
+## 6. Data and state
 
-- Глобального стора нет. Серверные данные не копируются в локальное состояние
-  «про запас» (`react.state.server-not-in-client-store`) **[Review]**.
-- Цепочка: `shared/api` (HTTP-клиент) → `entities/<entity>/api` (запрос) →
-  `entities/<entity>/model` (тип, маппер, хук) → виджет.
-- Хук загрузки возвращает размеченное объединение, а не набор булевых флагов:
+- There is no global store. Server data is not copied into local state
+  "just in case" (`react.state.server-not-in-client-store`) **[Review]**.
+- The chain: `shared/api` (HTTP client) → `entities/<entity>/api` (request) →
+  `entities/<entity>/model` (type, mapper, hook) → widget.
+- A loading hook returns a discriminated union, not a set of boolean flags:
   `{ status: 'loading' } | { status: 'success', data } | { status: 'not-found' } | { status: 'error' }`.
-- Эффект с запросом отменяет его при размонтировании и смене аргумента
-  (`AbortController`), поздний ответ не перезаписывает свежий
+- An effect that issues a request cancels it on unmount and on argument change
+  (`AbortController`); a late response does not overwrite a fresh one
   (`react.hooks.effect-cleanup`) **[Review]**.
-- Каждый промис обработан (`core.ts.no-floating-promises`) **[Review]**.
-- Ошибка сервера — это ошибка: ответ не-2xx превращается в типизированное
-  исключение, а не в «пустые данные».
+- Every promise is handled (`core.ts.no-floating-promises`) **[Review]**.
+- A server error is an error: a non-2xx response becomes a typed
+  exception, not "empty data".
 
-## 7. Безопасность
+## 7. Security
 
-Ответ API — недоверенный ввод. DummyJSON отдаёт вместе с профилем `password`, `ssn`,
-`bank`, `ip`, `macAddress`, `crypto`.
+An API response is untrusted input. DummyJSON returns `password`, `ssn`,
+`bank`, `ip`, `macAddress`, `crypto` along with the profile.
 
-- **Белый список.** Наружу из `entities/customer` выходят только поля модели
-  `Customer`, перечисленные в спеке. Маппер принимает `unknown`, проверяет форму и
-  собирает модель по одному полю. Спред сырого ответа (`{ ...dto }`) запрещён
+- **Allowlist.** Only the fields of the `Customer` model listed in the spec leave
+  `entities/customer`. The mapper takes `unknown`, checks the shape and
+  builds the model field by field. Spreading the raw response (`{ ...dto }`) is forbidden
   **[Review]**.
-- Сырые ответы и персональные данные не попадают в `console.*`
+- Raw responses and personal data do not end up in `console.*`
   (`core.sec.no-pii-in-logs`) **[Review]**.
-- Внешний URL проходит проверку перед использованием: адрес картинки — только
-  `https://`, идентификатор в пути запроса — только целое положительное число
+- An external URL is validated before use: an image address — `https://` only,
+  an identifier in the request path — a positive integer only
   (`core.sec.validated-urls`) **[Review]**.
-- Без `dangerouslySetInnerHTML`, без `eval` (`core.sec.no-eval`).
-- В репозитории нет секретов (`core.sec.no-secrets`). `.env` содержит только
-  публичный адрес API; читается в одном месте — `src/shared/config/env.ts`.
+- No `dangerouslySetInnerHTML`, no `eval` (`core.sec.no-eval`).
+- No secrets in the repository (`core.sec.no-secrets`). `.env` contains only
+  the public API address; it is read in one place — `src/shared/config/env.ts`.
 
-## 8. Тесты
+## 8. Tests
 
-- Vitest + Testing Library. Тест лежит в `__tests__/` рядом с кодом.
-- Проверяем поведение, а не реализацию: ищем по роли и доступному имени, не по
-  классу и не по `data-testid`.
-- Каждый критерий приёмки покрыт тестом, который упадёт, если критерий сломать.
-- Позитивный случай идёт в паре с негативным: «показывает X» + «не показывает X,
-  когда условие не выполнено».
-- Сеть в тестах не трогаем: `fetch` подменяется через `vi.stubGlobal`. Фикстура
-  ответа содержит и чувствительные поля — чтобы тест доказал, что они не утекли.
-- Тест без ожиданий, `it.skip` без причины, ослабленная проверка ради зелёного
-  результата — нарушение.
+- Vitest + Testing Library. A test lives in `__tests__/` next to the code.
+- We test behavior, not implementation: query by role and accessible name, not by
+  class and not by `data-testid`.
+- Every acceptance criterion is covered by a test that fails if the criterion is broken.
+- A positive case comes paired with a negative one: "shows X" + "does not show X
+  when the condition is not met".
+- Tests do not touch the network: `fetch` is replaced via `vi.stubGlobal`. The response
+  fixture includes the sensitive fields too — so the test proves they did not leak.
+- A test without expectations, `it.skip` without a reason, a check weakened for the sake of a green
+  result — all violations.
 
 ## 9. Definition of Done
 
-Задача завершена, когда:
+A task is complete when:
 
-1. `npm run validate` — зелёный (типы → линт → тесты), результат прочитан по каждому
-   шагу, а не по последней строке.
-2. Каждый критерий приёмки задачи покрыт автотестом; негативные пары на месте.
-3. Чек-лист этого документа пройден для всех затронутых файлов.
-4. Для UI: страница открыта в браузере и сверена с `docs/design/customer-360.png`.
-   Если исполнитель не может открыть браузер — он пишет это в hand-off явно.
-5. Hand-off оформлен по шаблону `.claude/skills/sdd/templates/handoff.md`.
+1. `npm run validate` is green (types → lint → tests), and the result has been read for every
+   step, not just the last line.
+2. Every acceptance criterion of the task is covered by an automated test; negative pairs are in place.
+3. The checklist in this document has been walked for all affected files.
+4. For UI: the page has been opened in a browser and checked against `docs/design/customer-360.png`.
+   If the implementer cannot open a browser, they say so explicitly in the hand-off.
+5. The hand-off follows the template `.github/skills/sdd/templates/handoff.md`.

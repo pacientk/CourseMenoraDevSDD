@@ -1,33 +1,33 @@
-# Дизайн-референс
+# Design reference
 
-| Файл | Что это | Как пользоваться |
+| File | What it is | How to use it |
 |---|---|---|
-| `customer-360.png` | Скриншот целевой страницы «תמונת לקוח 360» | Смотреть: композиция, иерархия, состояния |
-| `customer-360.reference.html` | Исходная разметка и CSS страницы (встроенные шрифты и картинки вырезаны) | Только `grep` по классу. **Не читать целиком** — 60 КБ |
-| `src/shared/ui/tokens.css` | Дизайн-токены, уже перенесённые из референса | Использовать через `var(--token)` |
+| `customer-360.png` | Screenshot of the target page «תמונת לקוח 360» | Look at it: composition, hierarchy, states |
+| `customer-360.reference.html` | Original markup and CSS of the page (embedded fonts and images stripped out) | `grep` by class only. **Do not read it whole** — 60 KB |
+| `src/shared/ui/tokens.css` | Design tokens, already carried over from the reference | Use via `var(--token)` |
 
-## Как искать в HTML-референсе
+## How to search the HTML reference
 
 ```sh
-grep -n "\.app-header\|\.nav-link" docs/design/customer-360.reference.html     # шапка и навигация
+grep -n "\.app-header\|\.nav-link" docs/design/customer-360.reference.html     # header and navigation
 grep -n "\.profile-card\|\.customer-layout\|\.profile" docs/design/customer-360.reference.html
-grep -n "\.card {" -A 12 docs/design/customer-360.reference.html               # базовая карточка
-grep -n "\.status\|\.skeleton" docs/design/customer-360.reference.html         # бейджи и скелетон
+grep -n "\.card {" -A 12 docs/design/customer-360.reference.html               # base card
+grep -n "\.status\|\.skeleton" docs/design/customer-360.reference.html         # badges and skeleton
 ```
 
-## Что берём в курс, а что нет
+## What goes into the course and what does not
 
-| Блок на скриншоте | Где реализуется |
+| Block on the screenshot | Where it is implemented |
 |---|---|
-| Шапка: бренд-подпись, навигация (לקוחות / תביעות / היסטוריית קשר) | SPEC-001 |
-| Заголовок страницы «תמונת לקוח 360» | SPEC-001 |
-| Карточка клиента: аватар, имя, контакты | SPEC-002 |
-| Список задач по клиенту (по мотивам «פניות אחרונות») | SPEC-002 |
-| Поиск другого клиента | SPEC-003 (самостоятельно) |
-| Претензия, документирование разговора, полисы, льготы, предложения | вне курса |
+| Header: brand label, navigation (לקוחות / תביעות / היסטוריית קשר) | SPEC-001 |
+| Page heading «תמונת לקוח 360» | SPEC-001 |
+| Customer card: avatar, name, contacts | SPEC-002 |
+| Customer task list (based on «פניות אחרונות») | SPEC-002 |
+| Search for another customer | SPEC-003 (self-study) |
+| Claim, call documentation, policies, benefits, offers | outside the course |
 
-Шрифт «Simpler Pro» в репозиторий не входит — работает запасной стек из токена
-`--font-sans`. Логотип не используется: в шапке текстовая подпись.
+The «Simpler Pro» font is not part of the repository — the fallback stack from the
+`--font-sans` token is used. The logo is not used: the header has a text label.
 
-Данные на скриншоте — демонстрационные. В курсе данные приходят из открытого API
-DummyJSON, поэтому имена и тексты задач будут на английском — это ожидаемо.
+The data on the screenshot is demo data. In the course, data comes from the open
+DummyJSON API, so names and task texts will be in English — that is expected.

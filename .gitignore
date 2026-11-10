@@ -26,8 +26,5 @@ dist-ssr
 # Vitest / coverage
 coverage
 
-# Claude Code: локальные настройки и память агентов-ревьюеров
-.claude/settings.local.json
-
-# Память агентов (ревьюер ведёт свои заметки по проекту)
-.claude/agent-memory
+# Personal VS Code settings that must not be shared
+.vscode/*.local.json

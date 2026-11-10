@@ -1,125 +1,126 @@
-# SPEC-002 — Профиль клиента: карточка клиента и задачи по клиенту
+# SPEC-002 — Customer profile: customer card and customer tasks
 
-> Бриф: `workshop/briefs/SPEC-002-customer-profile.md`. Дизайн: `docs/design/customer-360.png`
-> (блоки «פרטי לקוחה» и «פניות אחרונות»), `docs/design/README.md`.
+> Brief: `workshop/briefs/SPEC-002-customer-profile.md`. Design: `docs/design/customer-360.png`
+> (the "פרטי לקוחה" and "פניות אחרונות" blocks), `docs/design/README.md`.
 
 ## 1. Meta
 
-| Поле | Значение |
+| Field | Value |
 |---|---|
 | ID | SPEC-002 |
-| Название | Профиль клиента: карточка клиента и задачи по клиенту |
-| Трек | full (epic + tasks + plan) |
-| Статус | draft |
-| Версия | 1 |
-| Создана | 2026-11-09 |
-| Владелец | ведущий курса |
+| Title | Customer profile: customer card and customer tasks |
+| Track | full (epic + tasks + plan) |
+| Status | draft |
+| Version | 1 |
+| Created | 2026-11-09 |
+| Owner | course lead |
 
-Статус: `draft` → `approved` → `in-progress` → `done`. Перевод в `approved` делает
-человек. Задачи по эпику в статусе `draft` не нарезаются.
+Status: `draft` → `approved` → `in-progress` → `done`. Moving to `approved` is done by
+a human. An epic in `draft` status is not broken down into tasks.
 
-## 2. Суть
+## 2. Summary
 
-Страница `/customers/:customerId` после SPEC-001 показывает только заголовок. Строим два
-независимых блока: карточку клиента (аватар, имя, номер, телефон, почта, город) и
-карточку задач по клиенту (текст и статус «открыта / выполнена»). Данные приходят из
-открытого API DummyJSON. Ответ профиля содержит поля, которые показывать нельзя
-(`password`, `ssn`, `bank`, …), поэтому граница слоя данных — белый список.
+After SPEC-001 the page `/customers/:customerId` shows only a heading. We build two
+independent blocks: a customer card (avatar, name, number, phone, email, city) and a
+customer-tasks card (text and an "open / done" status). Data comes from the public
+DummyJSON API. The profile response contains fields that must not be shown
+(`password`, `ssn`, `bank`, …), so the data-layer boundary is an allowlist.
 
-## 3. Цель
+## 3. Goal
 
-Сотрудник открывает `/customers/N` и за секунду видит, с кем говорит и какие задачи по
-клиенту открыты. Страница корректно ведёт себя при загрузке, отсутствии клиента, ошибке
-сервера и неожиданном ответе, а чувствительные поля API нигде не появляются.
+An employee opens `/customers/N` and within a second sees who they are talking to and
+which tasks for that customer are open. The page behaves correctly while loading, when the
+customer is missing, on a server error and on an unexpected response, and sensitive API
+fields never appear anywhere.
 
-## 4. Пользователи и сценарии
+## 4. Users and scenarios
 
-- **US-1** — Как сотрудник сервисного центра во время звонка, я хочу видеть имя, номер
-  клиента, телефон, почту и город, чтобы сразу понять, с кем разговариваю.
-- **US-2** — Как сотрудник, я хочу видеть задачи по клиенту и их статус, чтобы знать, что
-  по нему ещё открыто.
-- **US-3** — Как сотрудник, быстро переключающийся между клиентами, я хочу, чтобы на
-  экране всегда был текущий клиент, а не данные предыдущего.
-- **US-4** — Как сотрудник, при сбое сервера я хочу сообщение и кнопку «נסו שוב», чтобы
-  повторить запрос, не перезагружая страницу.
+- **US-1** — As a service-centre employee on a call, I want to see the customer's name,
+  number, phone, email and city so that I immediately understand who I am talking to.
+- **US-2** — As an employee, I want to see the customer's tasks and their status so that I
+  know what is still open for them.
+- **US-3** — As an employee switching quickly between customers, I want the screen to
+  always show the current customer, not the previous one's data.
+- **US-4** — As an employee, when the server fails I want a message and a "נסו שוב" button
+  so that I can retry the request without reloading the page.
 
-## 5. Функциональные требования
+## 5. Functional requirements
 
-- **FR-1** — Клиент определяется сегментом `:customerId` адреса. Допустимый идентификатор —
-  целое положительное число (§7). Для недопустимого запрос к серверу не отправляется,
-  страница показывает «הלקוח לא נמצא».
-- **FR-2** — Карточка клиента загружает `GET /users/{id}` и показывает: аватар, полное имя,
-  номер клиента, телефон, почту, город.
-- **FR-3** — Карточка задач загружает `GET /users/{id}/todos` и показывает для каждой
-  задачи текст и статус «פתוח» или «בוצע». Если задач нет — «אין משימות ללקוח».
-- **FR-4** — Каждая карточка показывает состояния: загрузка; клиент не найден (`404`);
-  ошибка загрузки (сеть, не-2xx, неожиданная форма ответа) с кнопкой «נסו שוב»,
-  повторяющей запрос этой карточки.
-- **FR-5** — Карточки независимы: сбой или ожидание одной не скрывает и не блокирует
-  другую.
-- **FR-6** — Аватар — изображение, только если адрес начинается с `https://`. Иначе, и
-  если изображение не загрузилось, — инициалы клиента.
-- **FR-7** — Слой данных отдаёт только поля белого списка (§7). Остальные поля ответа не
-  попадают ни в модель, ни на экран, ни в логи.
-- **FR-8** — Запрос отменяется при смене клиента и размонтировании; поздний ответ по
-  прежнему клиенту не перезаписывает данные текущего. При смене клиента данные прежнего
-  не показываются, пока грузится новый.
+- **FR-1** — The customer is identified by the `:customerId` segment of the URL. A valid
+  identifier is a positive integer (§7). For an invalid one no request is sent to the server
+  and the page shows "הלקוח לא נמצא".
+- **FR-2** — The customer card loads `GET /users/{id}` and shows: avatar, full name,
+  customer number, phone, email, city.
+- **FR-3** — The tasks card loads `GET /users/{id}/todos` and shows, for each task, its
+  text and the status "פתוח" or "בוצע". If there are no tasks — "אין משימות ללקוח".
+- **FR-4** — Each card shows the states: loading; customer not found (`404`);
+  load error (network, non-2xx, unexpected response shape) with a "נסו שוב" button
+  that repeats that card's request.
+- **FR-5** — The cards are independent: a failure or wait in one neither hides nor blocks
+  the other.
+- **FR-6** — The avatar is an image only if its URL starts with `https://`. Otherwise, and
+  if the image failed to load, the customer's initials are shown.
+- **FR-7** — The data layer returns only allowlisted fields (§7). All other response fields
+  reach neither the model, nor the screen, nor the logs.
+- **FR-8** — The request is cancelled on customer change and on unmount; a late response
+  for the previous customer does not overwrite the current one's data. On customer change
+  the previous customer's data is not shown while the new one loads.
 
-## 6. UX и дизайн
+## 6. UX and design
 
-Референс: скриншот `docs/design/customer-360.png` — блок профиля (аватар, имя,
-телефон) и блок «פניות אחרונות» (карточка со списком). Классы HTML-референса (только
-`grep`): `.card`, `.profile-card`, `.profile*`, `.status*`, `.skeleton`, `.empty-state`,
+Reference: the screenshot `docs/design/customer-360.png` — the profile block (avatar, name,
+phone) and the "פניות אחרונות" block (a card with a list). Classes of the HTML reference
+(`grep` only): `.card`, `.profile-card`, `.profile*`, `.status*`, `.skeleton`, `.empty-state`,
 `.error-state` (`docs/design/README.md`).
 
-- Две карточки под заголовком страницы. Точная раскладка по сетке — решение
-  исполнителя в пределах токенов; на скриншоте блоки «פרטי לקוחה» и «פניות אחרונות» лежат
-  в разных колонках.
-- Блоки скриншота, которых нет в брифе (год присоединения, «מבוטחת פעילה», кнопка
-  WhatsApp, поиск, претензия и т. д.), **не реализуются**.
-- Статус задачи передаётся текстом, не только цветом: «פתוח» — `--warning*`, «בוצע» —
+- Two cards below the page heading. The exact grid layout is the implementer's decision
+  within the design tokens; on the screenshot the "פרטי לקוחה" and "פניות אחרונות" blocks sit
+  in different columns.
+- Screenshot blocks that are not in the brief (year joined, "מבוטחת פעילה", WhatsApp
+  button, search, claim, etc.) are **not implemented**.
+- Task status is conveyed by text, not only by colour: "פתוח" — `--warning*`, "בוצע" —
   `--success*`.
-- Состояния загрузки, пусто и ошибки скриншотом не показаны; берутся из `.skeleton`,
-  `.empty-state`, `.error-state` референса.
+- Loading, empty and error states are not shown on the screenshot; they are taken from the
+  reference's `.skeleton`, `.empty-state`, `.error-state`.
 
-| Назначение | Текст |
+| Purpose | Text |
 |---|---|
-| Заголовок карточки клиента | פרטי לקוח |
-| Подписи полей | מס׳ לקוח · טלפון · דוא״ל · עיר |
-| Загрузка карточки клиента | טוען פרטי לקוח |
-| Заголовок карточки задач | משימות טיפול |
-| Статусы задачи | פתוח · בוצע |
-| Загрузка задач | טוען משימות |
-| Нет задач | אין משימות ללקוח |
-| Клиент не найден | הלקוח לא נמצא |
-| Ошибка загрузки | לא הצלחנו לטעון את הנתונים |
-| Повторить | נסו שוב |
+| Customer card heading | פרטי לקוח |
+| Field labels | מס׳ לקוח · טלפון · דוא״ל · עיר |
+| Customer card loading | טוען פרטי לקוח |
+| Tasks card heading | משימות טיפול |
+| Task statuses | פתוח · בוצע |
+| Tasks loading | טוען משימות |
+| No tasks | אין משימות ללקוח |
+| Customer not found | הלקוח לא נמצא |
+| Load error | לא הצלחנו לטעון את הנתונים |
+| Retry | נסו שוב |
 
-Все строки — в `src/shared/i18n/he.ts`, без литералов в компонентах и тестах.
+All strings live in `src/shared/i18n/he.ts`; no literals in components or tests.
 
-## 7. Данные и контракты
+## 7. Data and contracts
 
-### Внешний API
+### External API
 
-База — `env.apiBaseUrl` (`VITE_API_BASE_URL`).
+Base URL — `env.apiBaseUrl` (`VITE_API_BASE_URL`).
 
 ```
 GET /users/{id}
-  Успех:   200 → объект пользователя. Используются: id, firstName, lastName, phone,
-           email, image, address.city. Прочие поля — недоверенные, не используются.
-  Ошибки:  404 — клиента нет; прочие не-2xx — ошибка сервера
+  Success: 200 → user object. Used: id, firstName, lastName, phone,
+           email, image, address.city. All other fields are untrusted and unused.
+  Errors:  404 — no such customer; any other non-2xx — server error
 
 GET /users/{id}/todos
-  Успех:   200 → { todos: [{ id, todo, completed, userId }], total, skip, limit }
-           todos может быть пустым массивом
-  Ошибки:  404 — клиента нет; прочие не-2xx — ошибка сервера
+  Success: 200 → { todos: [{ id, todo, completed, userId }], total, skip, limit }
+           todos may be an empty array
+  Errors:  404 — no such customer; any other non-2xx — server error
 ```
 
-`id` в пути — только прошедший проверку `^[1-9][0-9]*$` и `Number.isSafeInteger`.
-Допустимы: `1`, `42`. Недопустимы (запрос не уходит): `abc`, `0`, `-1`, `1.5`, `007`,
-`1e3`, пустая строка.
+The `id` in the path must pass `^[1-9][0-9]*$` and `Number.isSafeInteger`.
+Valid: `1`, `42`. Invalid (no request is sent): `abc`, `0`, `-1`, `1.5`, `007`,
+`1e3`, empty string.
 
-### Модель приложения
+### Application model
 
 ```ts
 interface Customer {
@@ -129,7 +130,7 @@ interface Customer {
   phone: string
   email: string
   city: string
-  avatarUrl: string | null // только https://, иначе null
+  avatarUrl: string | null // https:// only, otherwise null
 }
 
 interface CustomerTask {
@@ -152,48 +153,48 @@ interface ILoadResult<T> {
 // useCustomerTasks(customerId: number): ILoadResult<CustomerTask[]>
 ```
 
-Контракт HTTP-клиента (`shared/api`): ответ не-2xx — типизированное исключение со
-статусом; сетевой сбой и невалидный JSON — типизированное исключение; поддерживает
-`AbortSignal`. Сырой ответ маппер получает как `unknown`.
+HTTP client contract (`shared/api`): a non-2xx response is a typed exception carrying the
+status; a network failure and invalid JSON are typed exceptions; it supports
+`AbortSignal`. The mapper receives the raw response as `unknown`.
 
-### Маппинг
+### Mapping
 
-| Поле модели | Источник в ответе API | Правило |
+| Model field | Source in API response | Rule |
 |---|---|---|
-| `Customer.id` | `id` | обязательное, целое > 0 |
-| `Customer.firstName` | `firstName` | обязательное, непустая строка |
-| `Customer.lastName` | `lastName` | обязательное, непустая строка |
-| `Customer.phone` | `phone` | обязательное, непустая строка |
-| `Customer.email` | `email` | обязательное, непустая строка |
-| `Customer.city` | `address.city` | обязательное, непустая строка; `address` — объект |
-| `Customer.avatarUrl` | `image` | необязательное; строка с префиксом `https://` → она же, иначе `null` |
-| `CustomerTask.id` | `todos[].id` | обязательное, целое |
-| `CustomerTask.text` | `todos[].todo` | обязательное, строка |
-| `CustomerTask.isCompleted` | `todos[].completed` | обязательное, boolean |
+| `Customer.id` | `id` | required, integer > 0 |
+| `Customer.firstName` | `firstName` | required, non-empty string |
+| `Customer.lastName` | `lastName` | required, non-empty string |
+| `Customer.phone` | `phone` | required, non-empty string |
+| `Customer.email` | `email` | required, non-empty string |
+| `Customer.city` | `address.city` | required, non-empty string; `address` must be an object |
+| `Customer.avatarUrl` | `image` | optional; string with `https://` prefix → as is, otherwise `null` |
+| `CustomerTask.id` | `todos[].id` | required, integer |
+| `CustomerTask.text` | `todos[].todo` | required, string |
+| `CustomerTask.isCompleted` | `todos[].completed` | required, boolean |
 
-Нарушение правила обязательного поля, `todos` не массив, корень не объект — ошибка
-(`state: 'error'`), не пустая модель. Модель собирается по одному полю; спред сырого
-ответа запрещён.
+A violated required-field rule, `todos` not an array, or a non-object root is an error
+(`state: 'error'`), not an empty model. The model is built field by field; spreading the
+raw response is forbidden.
 
-**Поля ответа, которые не должны покидать слой данных:** `password`, `ssn`, `bank`
-(номер карты, IBAN), `ip`, `macAddress`, `crypto`, а также `userId` задач и любые
-поля сверх таблицы.
+**Response fields that must not leave the data layer:** `password`, `ssn`, `bank`
+(card number, IBAN), `ip`, `macAddress`, `crypto`, plus the tasks' `userId` and any
+field beyond the table.
 
-## 8. Архитектура
+## 8. Architecture
 
-Слои по `docs/architecture/conventions.md § 1`. Слайсы одного слоя друг друга не
-импортируют, поэтому задачи — отдельная сущность.
+Layers per `docs/architecture/conventions.md § 1`. Slices of the same layer do not import
+each other, so tasks are a separate entity.
 
-| Слой | Слайс | Содержимое |
+| Layer | Slice | Contents |
 |---|---|---|
-| shared | `api` | HTTP-клиент: `AbortSignal`, типизированные ошибки |
-| shared | `ui` | универсальные `Card`, `StatusBadge`, `Avatar` (картинка с откатом на инициалы), индикатор загрузки; без слов предметной области |
-| shared | `i18n/he.ts` | все строки §6 |
-| entities | `customer` | `api`, `model` (`Customer`, маппер, `useCustomer`) |
-| entities | `customer-task` | `api`, `model` (`CustomerTask`, маппер, `useCustomerTasks`) |
-| widgets | `profile-card` | карточка клиента, все состояния |
-| widgets | `customer-tasks` | карточка задач, все состояния |
-| pages | `customer` | разбор `customerId`, композиция двух виджетов, сообщение для недопустимого id |
+| shared | `api` | HTTP client: `AbortSignal`, typed errors |
+| shared | `ui` | generic `Card`, `StatusBadge`, `Avatar` (image with fallback to initials), loading indicator; no domain vocabulary |
+| shared | `i18n/he.ts` | all strings from §6 |
+| entities | `customer` | `api`, `model` (`Customer`, mapper, `useCustomer`) |
+| entities | `customer-task` | `api`, `model` (`CustomerTask`, mapper, `useCustomerTasks`) |
+| widgets | `profile-card` | customer card, all states |
+| widgets | `customer-tasks` | tasks card, all states |
+| pages | `customer` | `customerId` parsing, composition of the two widgets, message for an invalid id |
 
 ```mermaid
 flowchart TD
@@ -209,125 +210,125 @@ flowchart TD
     et --> cfg
 ```
 
-Параллельность: `he.ts`, `shared/api` и `shared/ui` — общий фундамент, который пишется
-до виджетов (один файл `he.ts` не правится двумя задачами сразу). Две сущности и два
-виджета друг от друга не зависят.
+Parallelism: `he.ts`, `shared/api` and `shared/ui` are the shared foundation, written
+before the widgets (the single file `he.ts` is not edited by two tasks at once). The two
+entities and the two widgets do not depend on each other.
 
-## 9. Нефункциональные требования
+## 9. Non-functional requirements
 
-- **Доступность:** загрузка — `role="status"` и `aria-busy`; ошибка — `role="alert"`;
-  кнопка «נסו שוב» — `button` с доступным именем; заголовки карточек — `h2`; изображение
-  аватара не дублирует имя (`alt=""`).
-- **RTL и вёрстка:** логические CSS-свойства; телефон и почта отображаются слева направо
-  (`dir="ltr"`, выравнивание по началу строки); длинное имя или почта не ломают карточку
-  (перенос).
-- **Безопасность:** белый список (§7); никаких `console.*` с ответами и ПДн; адрес
-  картинки и `id` проверяются; без `dangerouslySetInnerHTML`; новых пакетов нет.
-- **Надёжность:** `AbortController` на каждый запрос; отмена — не ошибка и не меняет
-  состояние; повторный запрос по «נסו שוב» тоже отменяем.
-- **Стили и строки:** цвета, размеры, отступы — только токены; строки — только из `he.ts`.
+- **Accessibility:** loading — `role="status"` and `aria-busy`; error — `role="alert"`;
+  the "נסו שוב" button — a `button` with an accessible name; card headings — `h2`; the
+  avatar image does not duplicate the name (`alt=""`).
+- **RTL and layout:** logical CSS properties; phone and email are displayed left to right
+  (`dir="ltr"`, aligned to the line start); a long name or email does not break the card
+  (wrapping).
+- **Security:** allowlist (§7); no `console.*` with responses or personal data; the image
+  URL and `id` are validated; no `dangerouslySetInnerHTML`; no new packages.
+- **Reliability:** an `AbortController` per request; cancellation is not an error and does
+  not change state; the repeated request on "נסו שוב" is cancellable too.
+- **Styles and strings:** colours, sizes, spacing — design tokens only; strings — from `he.ts` only.
 
-## 10. Критерии приёмки
+## 10. Acceptance criteria
 
-Проверяются на уровне поведения. Каждый восходит к требованию.
+Verified at the behaviour level. Each traces back to a requirement.
 
-- **AC-1** — Given адрес `/customers/abc`, `/customers/0`, `/customers/-1`,
-  `/customers/1.5`, `/customers/007`, when страница открыта, then виден текст «הלקוח לא נמצא»,
-  а `fetch` не вызван ни разу. Given `/customers/1`, then `fetch` вызван. *(FR-1)*
-- **AC-2** — Given `/users/1` вернул корректный профиль, when загрузка завершена, then в
-  карточке «פרטי לקוח» видны полное имя («имя фамилия»), значения с подписями «מס׳ לקוח»,
-  «טלפון», «דוא״ל», «עיר» (номер = `id`, город = `address.city`). *(FR-2)*
-- **AC-3** — Given ответы ещё не пришли, then в карточке клиента виден «טוען פרטי לקוח»
-  (`role="status"`, `aria-busy`), в карточке задач — «טוען משימות», подписей полей и
-  значений нет. После ответа индикатор исчезает. *(FR-4, §9)*
-- **AC-4** — Given `/users/1` вернул `404`, then карточка клиента показывает «הלקוח לא נמצא»,
-  не показывает кнопку «נסו שוב» и не показывает подписей полей. *(FR-4)*
-- **AC-5** — Given сервер вернул `500` или сетевую ошибку, then карточка показывает «לא
-  הצלחנו לטעון את הנתונים» (`role="alert"`) и кнопку «נסו שוב»; when кнопка нажата и повторный
-  запрос успешен, then ошибка исчезает, показаны данные, а `fetch` вызван повторно с тем
-  же адресом. *(FR-4)*
-- **AC-6** — Given ответ профиля неожиданной формы (нет `firstName`; `address` отсутствует;
-  тело — массив или не JSON; `phone` — число), then показано сообщение об ошибке с «נסו
-  שוב», страница не падает, пустая карточка не рисуется. Аналогично для задач: `todos` не
-  массив, у элемента нет `todo` или `completed` не boolean. *(FR-4, FR-7)*
-- **AC-7** — Given `todos` содержит задачи, then для каждой виден текст и статус:
-  `completed: true` → «בוצע», `completed: false` → «פתוח»; задача с `completed: false` не
-  помечена «בוצע» и наоборот. *(FR-3)*
-- **AC-8** — Given `todos: []`, then виден «אין משימות ללקוח». Given есть хотя бы одна
-  задача, then этого текста нет. *(FR-3)*
-- **AC-9** — Given запрос задач завершился ошибкой, then карточка клиента показывает данные,
-  а карточка задач — ошибку с «נסו שוב»; и наоборот. Повтор в одной карточке не
-  перезапрашивает другую. *(FR-5)*
-- **AC-10** — Given `image` начинается с `https://`, then в карточке есть изображение. Given
-  `image` — `http://…`, `javascript:…`, `data:…`, пустая строка или поле отсутствует, then
-  изображения нет, показаны инициалы (первые буквы имени и фамилии). Given изображение не
-  загрузилось (`error`), then показаны инициалы. *(FR-6)*
-- **AC-11** — Given фикстура профиля содержит `password`, `ssn`, `bank`, `ip`,
-  `macAddress`, `crypto`, then их значения не присутствуют в DOM, объект `Customer` из
-  маппера имеет ровно ключи `id, firstName, lastName, phone, email, city, avatarUrl`,
-  `CustomerTask` — ровно `id, text, isCompleted`, и ни один вызов `console.*` не содержит
-  значений этих полей. *(FR-7)*
-- **AC-12** — Given открыт клиент 1, ответ которого задерживается, when сотрудник
-  переключается на клиента 2, ответ клиента 2 приходит раньше, а затем приходит ответ
-  клиента 1, then на экране данные клиента 2 (в обеих карточках). Запрос клиента 1 отменён
-  через `AbortSignal`. Размонтирование тоже отменяет запрос без ошибки в консоли. *(FR-8)*
-- **AC-13** — Given показан клиент 1, when адрес сменился на клиента 2 и его данные ещё
-  грузятся, then данные клиента 1 не видны, показан индикатор загрузки. *(FR-8)*
-- **AC-14** — Given код слайсов этой спеки, when выполнен
-  `grep -rnP '[\x{0590}-\x{05FF}]' src --include=*.ts --include=*.tsx`, then совпадения
-  только в `src/shared/i18n/he.ts`; в новых `*.module.css` нет цветовых литералов (`#`,
-  `rgb(`) и числовых `px`/`rem`, кроме объявления токенов. *(§9 Стили и строки)*
-- **AC-15** — Given состояние `error`, then есть элемент с `role="alert"`; кнопка «נסו שוב»
-  находится по роли `button` и имени; заголовки «פרטי לקוח» и «משימות טיפול» находятся по
-  роли `heading`. *(§9 Доступность)*
-- **AC-16** — Given реализация завершена, then `npm run validate` зелёный, `package.json` и
-  lock-файл не изменены, в `tools/` и `docs/design/` изменений нет. *(§9 Безопасность)*
+- **AC-1** — Given the URL `/customers/abc`, `/customers/0`, `/customers/-1`,
+  `/customers/1.5`, `/customers/007`, when the page is open, then the text "הלקוח לא נמצא" is
+  visible and `fetch` was never called. Given `/customers/1`, then `fetch` was called. *(FR-1)*
+- **AC-2** — Given `/users/1` returned a valid profile, when loading has finished, then the
+  "פרטי לקוח" card shows the full name ("first last") and values with the labels "מס׳ לקוח",
+  "טלפון", "דוא״ל", "עיר" (number = `id`, city = `address.city`). *(FR-2)*
+- **AC-3** — Given the responses have not arrived yet, then the customer card shows "טוען פרטי לקוח"
+  (`role="status"`, `aria-busy`), the tasks card shows "טוען משימות", and there are no field
+  labels or values. After the response the indicator disappears. *(FR-4, §9)*
+- **AC-4** — Given `/users/1` returned `404`, then the customer card shows "הלקוח לא נמצא",
+  shows no "נסו שוב" button and shows no field labels. *(FR-4)*
+- **AC-5** — Given the server returned `500` or a network error, then the card shows "לא
+  הצלחנו לטעון את הנתונים" (`role="alert"`) and a "נסו שוב" button; when the button is pressed and
+  the repeated request succeeds, then the error disappears, the data is shown, and `fetch` was
+  called again with the same URL. *(FR-4)*
+- **AC-6** — Given a profile response of unexpected shape (no `firstName`; `address` missing;
+  body is an array or not JSON; `phone` is a number), then an error message with "נסו
+  שוב" is shown, the page does not crash, and no empty card is rendered. Likewise for tasks:
+  `todos` not an array, an item without `todo`, or `completed` not a boolean. *(FR-4, FR-7)*
+- **AC-7** — Given `todos` contains tasks, then each shows its text and status:
+  `completed: true` → "בוצע", `completed: false` → "פתוח"; a task with `completed: false` is not
+  marked "בוצע" and vice versa. *(FR-3)*
+- **AC-8** — Given `todos: []`, then "אין משימות ללקוח" is visible. Given at least one
+  task, then that text is absent. *(FR-3)*
+- **AC-9** — Given the tasks request failed, then the customer card shows data
+  and the tasks card shows an error with "נסו שוב"; and vice versa. Retrying in one card does
+  not re-request the other. *(FR-5)*
+- **AC-10** — Given `image` starts with `https://`, then the card contains an image. Given
+  `image` is `http://…`, `javascript:…`, `data:…`, an empty string or the field is missing, then
+  there is no image and the initials are shown (first letters of first and last name). Given the
+  image failed to load (`error`), then the initials are shown. *(FR-6)*
+- **AC-11** — Given the profile fixture contains `password`, `ssn`, `bank`, `ip`,
+  `macAddress`, `crypto`, then their values are absent from the DOM, the `Customer` object from
+  the mapper has exactly the keys `id, firstName, lastName, phone, email, city, avatarUrl`,
+  `CustomerTask` — exactly `id, text, isCompleted`, and no `console.*` call contains
+  the values of those fields. *(FR-7)*
+- **AC-12** — Given customer 1 is open and its response is delayed, when the employee
+  switches to customer 2, customer 2's response arrives first, and then customer 1's response
+  arrives, then the screen shows customer 2's data (in both cards). Customer 1's request was
+  cancelled via `AbortSignal`. Unmounting also cancels the request without a console error. *(FR-8)*
+- **AC-13** — Given customer 1 is shown, when the URL changed to customer 2 and their data is
+  still loading, then customer 1's data is not visible and the loading indicator is shown. *(FR-8)*
+- **AC-14** — Given the code of this spec's slices, when
+  `grep -rnP '[\x{0590}-\x{05FF}]' src --include=*.ts --include=*.tsx` is run, then matches
+  are only in `src/shared/i18n/he.ts`; new `*.module.css` files contain no colour literals (`#`,
+  `rgb(`) and no numeric `px`/`rem`, except token declarations. *(§9 Styles and strings)*
+- **AC-15** — Given the `error` state, then there is an element with `role="alert"`; the "נסו שוב"
+  button is found by role `button` and name; the headings "פרטי לקוח" and "משימות טיפול" are found by
+  role `heading`. *(§9 Accessibility)*
+- **AC-16** — Given the implementation is complete, then `npm run validate` is green, `package.json` and
+  the lock file are unchanged, and there are no changes in `tools/` and `docs/design/`. *(§9 Security)*
 
-## 11. Тестирование
+## 11. Testing
 
-- Уровни: юнит-тесты мапперов и валидации `id`/URL; хуки через Testing Library;
-  компонентные тесты виджетов; тест страницы на роутере (`MemoryRouter`).
-- Сеть не трогаем: `fetch` подменяется через `vi.stubGlobal`. Фикстура профиля содержит
-  чувствительные поля (AC-11). Гонку (AC-12) моделируют управляемые промисы.
-- Ручная проверка (G9): `npm run dev` и `npm run dev:offline`, адреса `/customers/1`,
-  `/customers/9999` (404), `/customers/abc`; сверка со скриншотом.
-- Сценарии по задачам — в `tasks.md`.
+- Levels: unit tests for the mappers and `id`/URL validation; hooks via Testing Library;
+  component tests for the widgets; a page test on the router (`MemoryRouter`).
+- No network access: `fetch` is replaced via `vi.stubGlobal`. The profile fixture contains
+  sensitive fields (AC-11). The race (AC-12) is modelled with controlled promises.
+- Manual check (G9): `npm run dev` and `npm run dev:offline`, URLs `/customers/1`,
+  `/customers/9999` (404), `/customers/abc`; comparison with the screenshot.
+- Per-task scenarios are in `tasks.md`.
 
-## 12. Не входит
+## 12. Out of scope
 
-- Поиск другого клиента (SPEC-003).
-- Претензии, полисы, льготы, документирование разговора, предложения.
-- Редактирование данных клиента.
-- Год присоединения и статус «מבוטחת פעילה» — в API таких полей нет.
-- Кэширование, пагинация задач, тёмная тема.
-- Блоки скриншота за пределами карточки клиента и списка задач.
-- Изменения `tools/`, `docs/design/`, офлайн-копии API.
+- Searching for another customer (SPEC-003).
+- Claims, policies, benefits, call documentation, offers.
+- Editing customer data.
+- Year joined and the "מבוטחת פעילה" status — the API has no such fields.
+- Caching, task pagination, dark theme.
+- Screenshot blocks beyond the customer card and the task list.
+- Changes to `tools/`, `docs/design/`, the offline API copy.
 
-## 13. Открытые вопросы
+## 13. Open questions
 
-1. **Обязательные поля профиля.** Принято: `image` необязателен, остальные шесть
-   полей обязательны. Подтвердить.
-2. **Один «битый» элемент в `todos`.** Принято: вся карточка задач — ошибка, элемент не
-   пропускается молча. Подтвердить.
-3. **`404` на запросе задач.** В брифе нет. Принято: карточка задач показывает «הלקוח לא
-   נמצא» (без «נסו שוב»), как карточка клиента.
-4. **Заголовок карточки.** Скриншот: «פרטי לקוחה» (женский род), бриф: «פרטי לקוח».
-   Принят бриф.
-5. **Таймаут запроса.** В брифе нет; принято: нет, запрос остаётся в загрузке до отмены
-   или ответа.
-6. **Инициалы.** Принято: первая буква имени + первая буква фамилии; в данных API — латиница.
-7. **Порядок задач и объём.** Принято: порядок ответа API; пагинации нет.
-8. **Кнопка «נסו שוב» при `404`.** Принято: нет — повтор не поможет. Подтвердить.
-9. **Адаптивность.** Требований в брифе нет; принято: на усмотрение исполнителя в
-   пределах токенов.
-10. **Размер аватара.** Подходящего токена нет (есть `--icon-xl` 40px и `--space-*`); нужен
-    ли новый токен — решение владельца. `tokens.css` лежит вне границ этой спеки.
+1. **Required profile fields.** Decided: `image` is optional, the other six
+   fields are required. To confirm.
+2. **A single "broken" item in `todos`.** Decided: the whole tasks card is an error; the item is
+   not silently skipped. To confirm.
+3. **`404` on the tasks request.** Not in the brief. Decided: the tasks card shows "הלקוח לא
+   נמצא" (without "נסו שוב"), like the customer card.
+4. **Card heading.** Screenshot: "פרטי לקוחה" (feminine), brief: "פרטי לקוח".
+   Resolved in favour of the brief.
+5. **Request timeout.** Not in the brief; decided: none, the request stays in loading until
+   cancelled or answered.
+6. **Initials.** Decided: first letter of the first name + first letter of the last name; API data is in Latin script.
+7. **Task order and volume.** Decided: API response order; no pagination.
+8. **"נסו שוב" button on `404`.** Decided: none — retrying will not help. To confirm.
+9. **Responsiveness.** No requirements in the brief; decided: at the implementer's discretion
+   within the design tokens.
+10. **Avatar size.** There is no suitable token (there are `--icon-xl` 40px and `--space-*`); whether
+    a new token is needed is the owner's decision. `tokens.css` lies outside this spec's boundaries.
 
-## 14. Риски и допущения
+## 14. Risks and assumptions
 
-| Риск / допущение | Что делаем |
+| Risk / assumption | What we do |
 |---|---|
-| Данные DummyJSON на английском, не иврит | Ожидаемо (`docs/design/README.md`) |
-| Публичный API недоступен без сети | `npm run dev:offline` обслуживает оба адреса (`mocks/mockApiPlugin.ts`) |
-| Два виджета пишутся параллельно и оба правят `he.ts` | Строки добавляются одной фундаментальной задачей до виджетов |
-| Строгая проверка `id` отсекает `007` | Фиксируем в AC-1: такой адрес — «клиент не найден» |
+| DummyJSON data is in English, not Hebrew | Expected (`docs/design/README.md`) |
+| The public API is unavailable without network | `npm run dev:offline` serves both URLs (`mocks/mockApiPlugin.ts`) |
+| Two widgets are written in parallel and both edit `he.ts` | Strings are added by one foundation task before the widgets |
+| Strict `id` validation rejects `007` | Fixed in AC-1: such a URL is "customer not found" |

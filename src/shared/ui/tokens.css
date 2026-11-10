@@ -1,5 +1,5 @@
-/* Дизайн-токены. Источник: docs/design/customer-360.reference.html (:root, светлая тема).
-   Значения не менять и не дублировать литералами в компонентах — только var(--token). */
+/* Design tokens. Source: docs/design/customer-360.reference.html (:root, light theme).
+   Do not change the values or duplicate them as literals in components — var(--token) only. */
 :root {
   color-scheme: light;
   --brand-yellow:#FFC700;
@@ -90,8 +90,8 @@
   --shadow-float:0 2px 8px rgba(50,15,91,.06),0 16px 44px rgba(50,15,91,.14);
 }
 
-/* Типографика и раскладка. В референсе эти значения записаны числами прямо в стилях;
-   здесь они вынесены в токены, чтобы компонентам не понадобился ни один литерал. */
+/* Typography and layout. In the reference these values are written as numbers inside the styles;
+   here they are tokens so that components never need a literal. */
 :root {
   --font-size-xs:12px;
   --line-height-xs:16px;

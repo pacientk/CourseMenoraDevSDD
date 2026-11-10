@@ -1,85 +1,85 @@
-# SPEC-001 — Каркас приложения: маршруты, шапка, навигация
+# SPEC-001 — Application shell: routes, header, navigation
 
 ## 1. Meta
 
-| Поле | Значение |
+| Field | Value |
 |---|---|
 | ID | SPEC-001 |
-| Название | Каркас приложения: маршруты, шапка, навигация |
-| Трек | small-spec |
-| Статус | approved |
-| Создана | 2026-11-09 |
-| Владелец | ведущий курса |
+| Title | Application shell: routes, header, navigation |
+| Track | small-spec |
+| Status | approved |
+| Created | 2026-11-09 |
+| Owner | course lead |
 
-Статус: `draft` → `approved` → `done`. Перевод в `approved` делает человек.
+Status: `draft` → `approved` → `done`. The move to `approved` is made by a human.
 
-## 2. Суть
+## 2. Summary
 
-Стартовый репозиторий показывает одну заглушку. Чтобы дальше строить страницу профиля
-клиента, нужен каркас: маршруты, общая шапка с навигацией и пустые страницы разделов.
-Данные с сервера в эту спеку не входят — они появятся в SPEC-002.
+The starter repository shows a single placeholder. To build the customer profile page
+on top of it, we need a shell: routes, a shared header with navigation, and empty section pages.
+Server data is not part of this spec — it arrives in SPEC-002.
 
-## 3. Цель
+## 3. Goal
 
-После изменения приложение открывается на `/customers/1`, показывает шапку с тремя
-пунктами меню, помечает активный пункт и корректно отвечает на неизвестный адрес.
+After the change, the application opens at `/customers/1`, shows a header with three
+menu items, marks the active item, and responds correctly to an unknown address.
 
-## 4. Границы
+## 4. Scope
 
-**Входит:**
+**In scope:**
 
-- Маршрутизация на React Router: `/`, `/customers/:customerId`, `/claims`,
-  `/history`, любой другой путь.
-- Виджет шапки `app-header`: текстовая подпись бренда и навигация.
-- Общий каркас страницы: шапка + область контента `main`.
-- Страница клиента с заголовком и пустой областью под карточки SPEC-002.
-- Страницы-заглушки разделов и страница «не найдено».
-- Константы маршрутов и все новые строки в словаре.
+- Routing on React Router: `/`, `/customers/:customerId`, `/claims`,
+  `/history`, any other path.
+- The `app-header` widget: a text brand label and navigation.
+- A shared page shell: header + `main` content area.
+- The customer page with a heading and an empty area for the SPEC-002 cards.
+- Section placeholder pages and a "not found" page.
+- Route constants and all new strings in the dictionary.
 
-**Не входит:**
+**Out of scope:**
 
-- Загрузка и отображение данных клиента (SPEC-002).
-- Логотип-картинка, блок сотрудника «ספיר», индикатор активного звонка.
-- Тёмная тема.
-- Отдельное мобильное меню: на узком экране навигация просто переносится на
-  следующую строку.
+- Loading and displaying customer data (SPEC-002).
+- An image logo, the employee block «ספיר», the active-call indicator.
+- Dark theme.
+- A separate mobile menu: on a narrow screen the navigation simply wraps to the
+  next line.
 
-## 5. Критерии приёмки
+## 5. Acceptance criteria
 
-- **AC-1** — Given открыт адрес `/`, when приложение загрузилось, then адрес
-  становится `/customers/1` и на странице есть заголовок первого уровня
+- **AC-1** — Given the address `/` is opened, when the application has loaded, then the address
+  becomes `/customers/1` and the page has a first-level heading
   «תמונת לקוח 360».
-- **AC-2** — На любой странице есть `nav` с доступным именем «ניווט ראשי» и ровно
-  тремя ссылками в порядке: «לקוחות», «תביעות», «היסטוריית קשר».
-- **AC-3** — На `/customers/1` ссылка «לקוחות» имеет `aria-current="page"`, две
-  другие — нет. На `/claims` `aria-current="page"` имеет только «תביעות».
-- **AC-4** — `/claims` и `/history` показывают заголовок первого уровня с названием
-  раздела и текст «בקרוב».
-- **AC-5** — Given открыт неизвестный адрес (например `/nope`), then показан
-  заголовок «הדף לא נמצא» и ссылка «חזרה לתמונת הלקוח», ведущая на `/customers/1`.
-- **AC-6** — В новых компонентах нет строковых литералов интерфейса, литералов
-  цветов и размеров, физических CSS-свойств направления (`left`, `right`,
-  `margin-left` и т. п.).
-- **AC-7** — `npm run validate` и `npm run build` завершаются без ошибок.
+- **AC-2** — Every page has a `nav` with the accessible name «ניווט ראשי» and exactly
+  three links in this order: «לקוחות», «תביעות», «היסטוריית קשר».
+- **AC-3** — On `/customers/1` the link «לקוחות» has `aria-current="page"`, the other
+  two do not. On `/claims` only «תביעות» has `aria-current="page"`.
+- **AC-4** — `/claims` and `/history` show a first-level heading with the section
+  name and the text «בקרוב».
+- **AC-5** — Given an unknown address is opened (for example `/nope`), then the heading
+  «הדף לא נמצא» and the link «חזרה לתמונת הלקוח» pointing to `/customers/1` are shown.
+- **AC-6** — New components contain no UI string literals, no color or size
+  literals, and no physical CSS direction properties (`left`, `right`,
+  `margin-left`, etc.).
+- **AC-7** — `npm run validate` and `npm run build` complete without errors.
 
-## 6. Заметки по реализации
+## 6. Implementation notes
 
-### Файлы
+### Files
 
-| Путь | Действие | Назначение |
+| Path | Action | Purpose |
 |---|---|---|
-| `src/shared/config/routes.ts` | создать | Константы маршрутов и построитель пути клиента |
-| `src/shared/i18n/he.ts` | изменить | Новые строки: бренд, навигация, заголовки, заглушки |
-| `src/widgets/app-header/` | создать | Шапка: подпись бренда + навигация |
-| `src/pages/customer/` | создать | Страница клиента: заголовок, подзаголовок, область под карточки |
-| `src/pages/coming-soon/` | создать | Заглушка раздела; название раздела приходит пропсом |
-| `src/pages/not-found/` | создать | Страница «не найдено» |
-| `src/app/AppLayout/` | создать | Каркас: шапка + `main` с вложенным маршрутом |
-| `src/app/AppRouter.tsx` | создать | Дерево маршрутов |
-| `src/app/App.tsx` | изменить | Подключить роутер вместо заглушки |
-| `src/app/__tests__/App.test.tsx` | изменить | Сценарии этой спеки вместо теста заглушки |
+| `src/shared/config/routes.ts` | create | Route constants and the customer path builder |
+| `src/shared/i18n/he.ts` | modify | New strings: brand, navigation, headings, placeholders |
+| `src/widgets/app-header/` | create | Header: brand label + navigation |
+| `src/pages/customer/` | create | Customer page: heading, subheading, area for the cards |
+| `src/pages/coming-soon/` | create | Section placeholder; the section name comes in as a prop |
+| `src/pages/not-found/` | create | "Not found" page |
+| `src/app/AppLayout/` | create | Shell: header + `main` with the nested route |
+| `src/app/AppRouter.tsx` | create | Route tree |
+| `src/app/App.tsx` | modify | Wire up the router instead of the placeholder |
+| `src/app/__tests__/App.test.tsx` | modify | Scenarios of this spec instead of the placeholder test |
 
-### Контракты
+### Contracts
 
 ```ts
 // src/shared/config/routes.ts
@@ -95,73 +95,73 @@ export const ROUTES = {
 export declare function customerPath(customerId: number): string // '/customers/1'
 ```
 
-Строки (ключи — на усмотрение исполнителя, тексты — обязательны):
+Strings (keys are up to the implementer, texts are mandatory):
 
-| Назначение | Текст |
+| Purpose | Text |
 |---|---|
-| Подпись бренда | מנורה מבטחים |
-| Подпись продукта | מרכז שירות |
-| Имя навигации (`aria-label`) | ניווט ראשי |
-| Пункты меню | לקוחות · תביעות · היסטוריית קשר |
-| Заголовок страницы клиента | תמונת לקוח 360 |
-| Подзаголовок страницы клиента | כל המידע לשיחה, במקום אחד |
-| Заглушка раздела | בקרוב |
-| Страница «не найдено» | הדף לא נמצא · חזרה לתמונת הלקוח |
+| Brand label | מנורה מבטחים |
+| Product label | מרכז שירות |
+| Navigation name (`aria-label`) | ניווט ראשי |
+| Menu items | לקוחות · תביעות · היסטוריית קשר |
+| Customer page heading | תמונת לקוח 360 |
+| Customer page subheading | כל המידע לשיחה, במקום אחד |
+| Section placeholder | בקרוב |
+| "Not found" page | הדף לא נמצא · חזרה לתמונת הלקוח |
 
-### Требования к поведению
+### Behavior requirements
 
-- Пункт «לקוחות» активен на любом адресе вида `/customers/…`.
-- Роутер создаётся в `App`, а дерево маршрутов — отдельный компонент, чтобы тесты
-  могли обернуть его в `MemoryRouter` с нужным начальным адресом.
-- Страница клиента пока не читает данные; параметр `customerId` она получит и
-  проверит в SPEC-002.
-- Вёрстка шапки сверяется с `docs/design/customer-360.png` и классами `.app-header`,
-  `.brand-label`, `.header-nav`, `.nav-link` в HTML-референсе.
+- The «לקוחות» item is active on any address of the form `/customers/…`.
+- The router is created in `App`, and the route tree is a separate component, so that tests
+  can wrap it in a `MemoryRouter` with the required initial address.
+- The customer page does not read data yet; it will receive and validate the `customerId`
+  parameter in SPEC-002.
+- The header layout is checked against `docs/design/customer-360.png` and the classes `.app-header`,
+  `.brand-label`, `.header-nav`, `.nav-link` in the HTML reference.
 
-### Зависимости
+### Dependencies
 
-`react-router` уже установлен. Новых пакетов и переменных окружения нет.
+`react-router` is already installed. No new packages or environment variables.
 
-## 7. Тесты
+## 7. Tests
 
-### Стратегия
+### Strategy
 
-Интеграционные тесты на уровне дерева маршрутов: `MemoryRouter` с начальным адресом,
-поиск по роли и доступному имени. Отдельные юнит-тесты на заглушки не нужны.
+Integration tests at the route-tree level: `MemoryRouter` with an initial address,
+queries by role and accessible name. Separate unit tests for the placeholders are not needed.
 
-### Основные сценарии
+### Main scenarios
 
-- **S-1** — Given начальный адрес `/` / Then виден заголовок «תמונת לקוח 360» —
-  покрывает AC-1.
-- **S-2** — Given любой адрес / Then в навигации «ניווט ראשי» три ссылки в заданном
-  порядке — покрывает AC-2.
-- **S-3** — Given `/customers/1` / Then `aria-current="page"` только у «לקוחות»;
-  Given `/claims` / Then только у «תביעות» — покрывает AC-3 (позитив и негатив).
-- **S-4** — Given `/history` / Then заголовок «היסטוריית קשר» и текст «בקרוב» —
-  покрывает AC-4.
-- **S-5** — Given `/nope` / Then заголовок «הדף לא נמצא» и ссылка с
-  `href="/customers/1"` — покрывает AC-5.
+- **S-1** — Given the initial address `/` / Then the heading «תמונת לקוח 360» is visible —
+  covers AC-1.
+- **S-2** — Given any address / Then the «ניווט ראשי» navigation has three links in the given
+  order — covers AC-2.
+- **S-3** — Given `/customers/1` / Then `aria-current="page"` only on «לקוחות»;
+  Given `/claims` / Then only on «תביעות» — covers AC-3 (positive and negative).
+- **S-4** — Given `/history` / Then the heading «היסטוריית קשר» and the text «בקרוב» —
+  covers AC-4.
+- **S-5** — Given `/nope` / Then the heading «הדף לא נמצא» and a link with
+  `href="/customers/1"` — covers AC-5.
 
-### Дополнительные сценарии (заполняет исполнитель)
+### Additional scenarios (filled in by the implementer)
 
-- (пусто)
+- (empty)
 
-### Ручная проверка
+### Manual check
 
-- [ ] `npm run dev`, открыть `http://localhost:5173` — адрес сменился на
+- [ ] `npm run dev`, open `http://localhost:5173` — the address has changed to
       `/customers/1`.
-- [ ] Шапка визуально соответствует `docs/design/customer-360.png`: подпись бренда
-      справа, меню по центру, активный пункт выделен.
-- [ ] Переход по трём пунктам меню с клавиатуры (Tab, Enter), фокус виден.
+- [ ] The header visually matches `docs/design/customer-360.png`: brand label
+      on the right, menu in the center, active item highlighted.
+- [ ] Navigating the three menu items with the keyboard (Tab, Enter), focus is visible.
 
-## 8. Открытые вопросы
+## 8. Open questions
 
-- нет
+- none
 
-## 9. Журнал исполнения
+## 9. Execution log
 
-Заполняет оркестратор после hand-off исполнителя.
+Filled in by the orchestrator after the implementer's hand-off.
 
-| Дата | Событие | Результат |
+| Date | Event | Result |
 |---|---|---|
 | | | |

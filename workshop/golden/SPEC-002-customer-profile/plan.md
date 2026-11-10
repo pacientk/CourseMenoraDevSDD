@@ -1,40 +1,40 @@
-# SPEC-002 — План исполнения
+# SPEC-002 — Execution plan
 
 ## 1. Meta
 
-| Поле | Значение |
+| Field | Value |
 |---|---|
-| Эпик | [SPEC-002: Профиль клиента: карточка клиента и задачи по клиенту](./epic.md) |
-| Задачи | [tasks.md](./tasks.md) |
-| Статус | not-started |
-| Создан | 2026-11-09 |
-| Исполнитель | агент `react-engineer` |
-| Режим остановки | per-wave — пауза после каждой волны |
-| Параллельность | не больше 3 агентов в волне |
-| Ревью | независимое, `/reviewer:review`; не больше 2 раундов |
+| Epic | [SPEC-002: Customer profile: customer card and customer tasks](./epic.md) |
+| Tasks | [tasks.md](./tasks.md) |
+| Status | not-started |
+| Created | 2026-11-09 |
+| Implementer | the `react-engineer` agent |
+| Stop mode | per-wave — pause after every wave |
+| Parallelism | at most 3 agents per wave |
+| Review | independent, `/review`; at most 2 rounds |
 
-Статус: `not-started` → `in-progress` → `completed` / `blocked`. Пишет оркестратор.
+Status: `not-started` → `in-progress` → `completed` / `blocked`. Written by the orchestrator.
 
-## 2. Сводка
+## 2. Summary
 
-- **Задач:** 5
-- **Волн:** 3
-- **Критический путь:** 3 задачи
+- **Tasks:** 5
+- **Waves:** 3
+- **Critical path:** 3 tasks
 
-Фундамент — две независимые задачи: слой данных (T-001) и общие UI-элементы со словарём
-строк (T-002). Работа расходится параллельно на два виджета (T-003, T-004), которые
-друг от друга не зависят, и сходится в одной задаче сборки страницы (T-005).
-`src/shared/i18n/he.ts` правит только T-002.
+The foundation is two independent tasks: the data layer (T-001) and the shared UI elements with
+the string dictionary (T-002). Work then fans out in parallel to two widgets (T-003, T-004), which
+do not depend on each other, and converges in a single page-assembly task (T-005).
+`src/shared/i18n/he.ts` is edited only by T-002.
 
-## 3. Граф зависимостей
+## 3. Dependency graph
 
 ```mermaid
 flowchart LR
-    T001[T-001: Слой данных]
-    T002[T-002: UI-элементы и he.ts]
+    T001[T-001: Data layer]
+    T002[T-002: UI elements and he.ts]
     T003[T-003: profile-card]
     T004[T-004: customer-tasks]
-    T005[T-005: Страница customer]
+    T005[T-005: customer page]
     T001 --> T003
     T001 --> T004
     T002 --> T003
@@ -43,91 +43,91 @@ flowchart LR
     T004 --> T005
 ```
 
-Стрелка: источник блокирует цель.
+Arrow: source blocks target.
 
-## 4. Критический путь
+## 4. Critical path
 
-`T-001 → T-003 → T-005` (равнозначно через T-004; T-001 и T-002 — оба размера M).
+`T-001 → T-003 → T-005` (equivalent via T-004; T-001 and T-002 are both size M).
 
-Параллельность эту цепочку не сокращает — за блокерами на ней следим в первую очередь.
-Самый рискованный узел — T-001 (верхняя граница M, три модуля).
+Parallelism does not shorten this chain — blockers on it are watched first.
+The riskiest node is T-001 (upper bound of M, three modules).
 
-## 5. Dry-run: конфликты до старта
+## 5. Dry run: conflicts before start
 
-### Пересечения путей внутри волны
+### Path overlaps within a wave
 
-| Волна | Задачи | Общий путь | Риск | Решение |
+| Wave | Tasks | Shared path | Risk | Resolution |
 |---|---|---|---|---|
-| 1 | T-001, T-002 | нет (`shared/api`, `entities/*` против `shared/ui/*`, `he.ts`) | — | — |
-| 2 | T-003, T-004 | нет (`widgets/profile-card` против `widgets/customer-tasks`) | — | `he.ts` и `shared/ui` в волне 2 только читаются |
-| 3 | T-005 | — (одна задача) | — | — |
+| 1 | T-001, T-002 | none (`shared/api`, `entities/*` vs `shared/ui/*`, `he.ts`) | — | — |
+| 2 | T-003, T-004 | none (`widgets/profile-card` vs `widgets/customer-tasks`) | — | `he.ts` and `shared/ui` are read-only in wave 2 |
+| 3 | T-005 | — (single task) | — | — |
 
-Общие файлы вне путей задач: `src/shared/ui/index.ts` — только T-002; `package.json`,
-lock-файл — никто. `npm run validate` во время параллельной волны может показать ошибку
-типов или линта в чужом, ещё не дописанном файле — исполнители о ней сообщают, не чинят.
+Shared files outside the task paths: `src/shared/ui/index.ts` — T-002 only; `package.json`,
+the lock file — nobody. During a parallel wave `npm run validate` may show a type or lint
+error in someone else's not-yet-finished file — implementers report it, they do not fix it.
 
-### Внешние зависимости
+### External dependencies
 
-- **Пакеты:** новых нет.
-- **Переменные окружения:** `VITE_API_BASE_URL` — уже есть, читается только в `shared/config/env.ts`.
-- **Внешние сервисы:** DummyJSON; без сети — `npm run dev:offline`. Тесты сеть не трогают.
+- **Packages:** no new ones.
+- **Environment variables:** `VITE_API_BASE_URL` — already exists, read only in `shared/config/env.ts`.
+- **External services:** DummyJSON; without network — `npm run dev:offline`. Tests do not touch the network.
 
-## 6. Волны
+## 6. Waves
 
-### Волна 1 — Фундамент
+### Wave 1 — Foundation
 
-- **Задачи:** T-001, T-002
-- **Параллельно:** 2 агента
-- **Проверка в конце:** `npm run validate`
-- **Что должно получиться:** хуки `useCustomer` и `useCustomerTasks` с тестами; `Card`,
-  `StatusBadge`, `Avatar`, `Loader` в `@/shared/ui`; все строки эпика §6 в `he.ts`.
+- **Tasks:** T-001, T-002
+- **In parallel:** 2 agents
+- **Check at the end:** `npm run validate`
+- **Expected outcome:** the `useCustomer` and `useCustomerTasks` hooks with tests; `Card`,
+  `StatusBadge`, `Avatar`, `Loader` in `@/shared/ui`; all epic §6 strings in `he.ts`.
 
-### Волна 2 — Виджеты
+### Wave 2 — Widgets
 
-- **Задачи:** T-003, T-004
-- **Параллельно:** 2 агента
-- **Ждёт:** волну 1
-- **Проверка в конце:** `npm run validate`
-- **Что должно получиться:** `ProfileCard` и `CustomerTasks` со всеми состояниями, покрытые
-  тестами; на странице они ещё не подключены.
+- **Tasks:** T-003, T-004
+- **In parallel:** 2 agents
+- **Waits for:** wave 1
+- **Check at the end:** `npm run validate`
+- **Expected outcome:** `ProfileCard` and `CustomerTasks` with all states, covered by
+  tests; not yet wired into the page.
 
-### Волна 3 — Сборка страницы
+### Wave 3 — Page assembly
 
-- **Задачи:** T-005
-- **Ждёт:** волну 2
-- **Проверка в конце:** `npm run validate`, `grep` из AC-14 эпика, `git status` по `package.json`,
-  lock-файлу, `tools/`, `docs/design/`
-- **Что должно получиться:** `/customers/N` показывает две карточки; недопустимый id даёт
-  «הלקוח לא נמצא» без запроса; тесты оболочки SPEC-001 проходят с подменой `fetch`.
+- **Tasks:** T-005
+- **Waits for:** wave 2
+- **Check at the end:** `npm run validate`, the `grep` from epic AC-14, `git status` for `package.json`,
+  the lock file, `tools/`, `docs/design/`
+- **Expected outcome:** `/customers/N` shows two cards; an invalid id yields
+  "הלקוח לא נמצא" without a request; the SPEC-001 shell tests pass with the `fetch` stub.
 
-## 7. Гейты
+## 7. Gates
 
-Перед записью каждой строки проверено, что инструмент существует.
+Before each row was written, the tool was verified to exist.
 
-| Гейт | Когда | Чем | Подключён |
+| Gate | When | How | Wired up |
 |---|---|---|---|
-| G4 Task DoD | после каждой задачи | `npm run validate` + hand-off | да (`.claude/agents/react-engineer.md` есть) |
-| G5 Review | после последней волны | `/reviewer:review` → `/sdd fix`, до 2 раундов | проверить перед стартом: `claude plugin list` содержит `reviewer` |
-| G6 Security | после `APPROVED` | `/security-review`, `npm run audit:deps` | да (`git rev-parse --verify origin/HEAD` проходит) |
-| G7 Spec close | после security | `/sdd close` | да |
-| G8 Build | в `/sdd close` | `npm run release:check` | да |
-| G9 Release | в конце | `npm run preview` + ручная проверка | да |
+| G4 Task DoD | after every task | `npm run validate` + hand-off | yes (`.github/agents/react-engineer.agent.md` exists) |
+| G5 Review | after the last wave | `/review` → `/sdd fix`, up to 2 rounds | check before start: `.github/agents/code-reviewer.agent.md` exists |
+| G6 Security | after `APPROVED` | `/security-review`, `npm run audit:deps` | yes (`git rev-parse --verify main` passes) |
+| G7 Spec close | after security | `/sdd close` | yes |
+| G8 Build | in `/sdd close` | `npm run release:check` | yes |
+| G9 Release | at the end | `npm run preview` + manual check | yes |
 
-## 8. Риски исполнения
+## 8. Execution risks
 
-| Риск | Вероятность | Что делаем |
+| Risk | Likelihood | What we do |
 |---|---|---|
-| T-001 не вмещается в M | средняя | исполнитель останавливается и сообщает; оркестратор режет задачу, не исполнитель |
-| Внешний API недоступен из сети | средняя | `npm run dev:offline`; тесты сеть не трогают |
-| Общий хук `useAsyncResource` — расширение эпика §8 | низкая | зафиксировать решение владельца до запуска волны 1 |
-| Размер аватара без токена (эпик §13 п. 10) | низкая | временно `--space-16`; решение владельца |
-| `App.test.tsx` ходит в сеть после сборки страницы | высокая | покрыто в T-005 (подмена `fetch`, прежние проверки не менять) |
+| T-001 does not fit in M | medium | the implementer stops and reports; the orchestrator splits the task, not the implementer |
+| External API unreachable from the network | medium | `npm run dev:offline`; tests do not touch the network |
+| The shared `useAsyncResource` hook extends epic §8 | low | record the owner's decision before wave 1 starts |
+| Avatar size has no token (epic §13 item 10) | low | temporarily `--space-16`; owner's decision |
+| `App.test.tsx` hits the network after page assembly | high | covered in T-005 (`fetch` stub, previous assertions unchanged) |
 
-## 9. Журнал прогресса
+## 9. Progress log
 
-Пишет только оркестратор — исполнители возвращают свою строку в hand-off.
+Written only by the orchestrator — implementers return their row in the hand-off.
 
-| Задача | Волна | Начата | Завершена | Статус | Гейт | Заметки |
+| Task | Wave | Started | Completed | Status | Gate | Notes |
 |---|---|---|---|---|---|---|
 | T-001 | 1 | | | not-started | | |
 | T-002 | 1 | | | not-started | | |

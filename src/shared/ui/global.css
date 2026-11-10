@@ -1,4 +1,4 @@
-/* Базовые стили приложения. Только токены из tokens.css, только логические свойства (RTL). */
+/* Base application styles. Tokens from tokens.css only, logical properties only (RTL). */
 * {
   box-sizing: border-box;
 }

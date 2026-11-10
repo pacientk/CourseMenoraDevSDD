@@ -1,122 +1,122 @@
-# SPEC-002 — Задачи
+# SPEC-002 — Tasks
 
-**Эпик:** [SPEC-002: Профиль клиента: карточка клиента и задачи по клиенту](./epic.md)
-**Статус:** not-started
-**Создан:** 2026-11-09
+**Epic:** [SPEC-002: Customer profile: customer card and customer tasks](./epic.md)
+**Status:** not-started
+**Created:** 2026-11-09
 
-## Индекс задач
+## Task index
 
-| ID | Название | Тип | Размер | Статус | Blocked by | Blocks |
+| ID | Title | Type | Size | Status | Blocked by | Blocks |
 |---|---|---|---|---|---|---|
-| T-001 | Слой данных: HTTP-клиент, хук загрузки, сущности `customer` и `customer-task` | feature | M | not-started | — | T-003, T-004 |
-| T-002 | Общие UI-элементы и словарь строк | feature | M | not-started | — | T-003, T-004 |
-| T-003 | Виджет `profile-card` | feature | M | not-started | T-001, T-002 | T-005 |
-| T-004 | Виджет `customer-tasks` | feature | M | not-started | T-001, T-002 | T-005 |
-| T-005 | Страница `customer`: разбор id и сборка | feature | S | not-started | T-003, T-004 | — |
+| T-001 | Data layer: HTTP client, loading hook, `customer` and `customer-task` entities | feature | M | not-started | — | T-003, T-004 |
+| T-002 | Shared UI elements and string dictionary | feature | M | not-started | — | T-003, T-004 |
+| T-003 | `profile-card` widget | feature | M | not-started | T-001, T-002 | T-005 |
+| T-004 | `customer-tasks` widget | feature | M | not-started | T-001, T-002 | T-005 |
+| T-005 | `customer` page: id parsing and assembly | feature | S | not-started | T-003, T-004 | — |
 
-Размер: `S` — один компонент или модуль; `M` — несколько файлов, небольшие проектные
-решения. T-001 — верхняя граница `M` (три модуля в трёх слайсах); если исполнитель
-упирается в объём, он останавливается и сообщает, а не режет углы.
+Size: `S` — one component or module; `M` — several files, small design
+decisions. T-001 is the upper bound of `M` (three modules in three slices); if the implementer
+runs out of room, they stop and report rather than cutting corners.
 
-Статус: `not-started` → `in-progress` → `completed` / `blocked`.
+Status: `not-started` → `in-progress` → `completed` / `blocked`.
 
-## Граф зависимостей
+## Dependency graph
 
 ```mermaid
 flowchart LR
-    T001[T-001 данные] --> T003[T-003 profile-card]
+    T001[T-001 data] --> T003[T-003 profile-card]
     T001 --> T004[T-004 customer-tasks]
     T002[T-002 UI + he.ts] --> T003
     T002 --> T004
-    T003 --> T005[T-005 страница]
+    T003 --> T005[T-005 page]
     T004 --> T005
 ```
 
-Волны: **1** — T-001 ∥ T-002; **2** — T-003 ∥ T-004; **3** — T-005.
-`src/shared/i18n/he.ts` правит только T-002.
+Waves: **1** — T-001 ∥ T-002; **2** — T-003 ∥ T-004; **3** — T-005.
+`src/shared/i18n/he.ts` is edited only by T-002.
 
-## Трассировка AC эпика
+## Epic AC traceability
 
-Каждый AC эпика достался хотя бы одной задаче. Первой указана задача, чей тест
-главный; остальные проверяют свою часть.
+Every epic AC is assigned to at least one task. The first task listed is the one whose test
+is primary; the others verify their own part.
 
-| AC эпика | Задачи |
+| Epic AC | Tasks |
 |---|---|
-| AC-1 | T-005 (разбор id), T-001 (защита id в запросе) |
+| AC-1 | T-005 (id parsing), T-001 (id guard in the request) |
 | AC-2 | T-003 |
-| AC-3 | T-003, T-004, T-002 (индикатор) |
+| AC-3 | T-003, T-004, T-002 (indicator) |
 | AC-4 | T-003, T-004, T-001 (`404` → `not-found`) |
 | AC-5 | T-003, T-004, T-001 (`retry`) |
-| AC-6 | T-001 (маппер), T-003, T-004 |
+| AC-6 | T-001 (mapper), T-003, T-004 |
 | AC-7 | T-004, T-002 (`StatusBadge`) |
 | AC-8 | T-004 |
 | AC-9 | T-005, T-003, T-004 |
-| AC-10 | T-001 (`avatarUrl`), T-002 (откат при `error`), T-003 |
-| AC-11 | T-001 (ключи модели, логи), T-003, T-004 (DOM) |
-| AC-12 | T-001 (хук), T-005 (страница) |
-| AC-13 | T-001 (хук), T-005 (страница) |
-| AC-14 | T-002, T-003, T-004, T-005 (итоговый `grep`) |
+| AC-10 | T-001 (`avatarUrl`), T-002 (fallback on `error`), T-003 |
+| AC-11 | T-001 (model keys, logs), T-003, T-004 (DOM) |
+| AC-12 | T-001 (hook), T-005 (page) |
+| AC-13 | T-001 (hook), T-005 (page) |
+| AC-14 | T-002, T-003, T-004, T-005 (final `grep`) |
 | AC-15 | T-002, T-003, T-004 |
-| AC-16 | T-005 (итоговая проверка), все задачи (не трогать `package.json`) |
+| AC-16 | T-005 (final check), all tasks (do not touch `package.json`) |
 
 ---
 
-## T-001: Слой данных — HTTP-клиент, хук загрузки, сущности
+## T-001: Data layer — HTTP client, loading hook, entities
 
 ### Meta
 
-| Поле | Значение |
+| Field | Value |
 |---|---|
-| Тип | feature |
-| Размер | M |
-| Статус | not-started |
+| Type | feature |
+| Size | M |
+| Status | not-started |
 | Scope paths | `src/shared/api/**`, `src/entities/customer/**`, `src/entities/customer-task/**` |
 | Blocked by | — |
 | Blocks | T-003, T-004 |
-| Разделы эпика | §5 FR-1 (защита id), FR-2, FR-3, FR-4, FR-7, FR-8; §7; §9 Безопасность, Надёжность; §10 AC-4, AC-5, AC-6, AC-10, AC-11, AC-12, AC-13 |
+| Epic sections | §5 FR-1 (id guard), FR-2, FR-3, FR-4, FR-7, FR-8; §7; §9 Security, Reliability; §10 AC-4, AC-5, AC-6, AC-10, AC-11, AC-12, AC-13 |
 
-### Цель
+### Goal
 
-`useCustomer(id)` и `useCustomerTasks(id)` отдают размеченное объединение `LoadState`,
-собирают модель белым списком, отменяют запросы и не показывают данные прежнего клиента.
+`useCustomer(id)` and `useCustomerTasks(id)` return the `LoadState` discriminated union,
+build the model via an allowlist, cancel requests and do not show the previous customer's data.
 
-### Контекст
+### Context
 
-Фундамент данных. Виджеты T-003 и T-004 берут из него только хуки и типы моделей.
-Строк интерфейса здесь нет, поэтому `he.ts` не трогается.
+The data foundation. Widgets T-003 and T-004 take only the hooks and model types from it.
+There are no UI strings here, so `he.ts` is not touched.
 
-### Входит
+### In scope
 
-- `shared/api`: HTTP-клиент, типизированные ошибки, проверка id, типы `LoadState` /
-  `ILoadResult`, общий хук загрузки `useAsyncResource` (отмена, гонка, `retry`) —
-  чтобы логика `AbortController` жила в одном месте, а не копировалась в две сущности.
-- `entities/customer`: запрос, тип `Customer`, маппер, `useCustomer`.
-- `entities/customer-task`: запрос, тип `CustomerTask`, маппер, `useCustomerTasks`.
-- Юнит-тесты мапперов, клиента, хуков.
+- `shared/api`: HTTP client, typed errors, id validation, the `LoadState` /
+  `ILoadResult` types, the shared loading hook `useAsyncResource` (cancellation, race, `retry`) —
+  so that the `AbortController` logic lives in one place instead of being copied into two entities.
+- `entities/customer`: request, `Customer` type, mapper, `useCustomer`.
+- `entities/customer-task`: request, `CustomerTask` type, mapper, `useCustomerTasks`.
+- Unit tests for the mappers, the client, the hooks.
 
-### Не входит
+### Out of scope
 
-- Компоненты, CSS, строки, `he.ts` (T-002 и виджеты).
-- Вычисление инициалов (T-003).
-- Разбор `:customerId` из адреса (T-005): здесь только защита самого запроса.
-- Новые пакеты, правки `env.ts`.
+- Components, CSS, strings, `he.ts` (T-002 and the widgets).
+- Computing initials (T-003).
+- Parsing `:customerId` from the URL (T-005): here only the guard on the request itself.
+- New packages, changes to `env.ts`.
 
-### Контракты
+### Contracts
 
 ```ts
-// shared/api/index.ts — публичный API слайса
-export class HttpError extends Error { readonly status: number }   // ответ не-2xx
-export class NetworkError extends Error {}                          // сетевой сбой
-export class ParseError extends Error {}                            // невалидный JSON
+// shared/api/index.ts — the slice's public API
+export class HttpError extends Error { readonly status: number }   // non-2xx response
+export class NetworkError extends Error {}                          // network failure
+export class ParseError extends Error {}                            // invalid JSON
 export function getJson(path: string, options?: { signal?: AbortSignal }): Promise<unknown>
-// URL = env.apiBaseUrl + path (env из '@/shared/config/env'). Отмена: промис
-// отклоняется как AbortError, не оборачивается в NetworkError.
+// URL = env.apiBaseUrl + path (env from '@/shared/config/env'). Cancellation: the promise
+// rejects with AbortError, not wrapped in NetworkError.
 export function isAbortError(error: unknown): boolean
 
 export function parseResourceId(raw: string | undefined): number | null
-// ^[1-9][0-9]*$ и Number.isSafeInteger → число, иначе null.
-// Допустимо: '1', '42'. Недопустимо: 'abc','0','-1','1.5','007','1e3','', undefined.
-export function isResourceId(value: number): boolean   // целое > 0, safe integer
+// ^[1-9][0-9]*$ and Number.isSafeInteger → number, otherwise null.
+// Valid: '1', '42'. Invalid: 'abc','0','-1','1.5','007','1e3','', undefined.
+export function isResourceId(value: number): boolean   // integer > 0, safe integer
 
 export type LoadState<T> =
   | { status: 'loading' }
@@ -129,169 +129,169 @@ export function useAsyncResource<T>(
   key: number,
   load: (signal: AbortSignal) => Promise<T>,
 ): ILoadResult<T>
-// - первый рендер и любая смена key: state = loading уже в том же рендере
-//   (данные прежнего key не показываются ни на один кадр);
-// - HttpError 404 → not-found; любая другая ошибка (HttpError, NetworkError,
-//   ParseError, ошибка маппера) → error; AbortError игнорируется;
-// - при смене key и размонтировании запрос отменяется; поздний ответ не
-//   записывается; retry() отменяет текущий запрос и запускает новый.
+// - first render and any key change: state = loading already in that same render
+//   (the previous key's data is not shown for even one frame);
+// - HttpError 404 → not-found; any other error (HttpError, NetworkError,
+//   ParseError, mapper error) → error; AbortError is ignored;
+// - on key change and on unmount the request is cancelled; a late response is not
+//   written; retry() cancels the current request and starts a new one.
 
 // entities/customer/index.ts
 export interface Customer {
   id: number; firstName: string; lastName: string
   phone: string; email: string; city: string
-  avatarUrl: string | null            // только https://, иначе null
+  avatarUrl: string | null            // https:// only, otherwise null
 }
 export function useCustomer(customerId: number): ILoadResult<Customer>
-// GET /users/{id}. Маппер принимает unknown, в index.ts не экспортируется.
+// GET /users/{id}. The mapper takes unknown and is not exported from index.ts.
 
 // entities/customer-task/index.ts
 export interface CustomerTask { id: number; text: string; isCompleted: boolean }
 export function useCustomerTasks(customerId: number): ILoadResult<CustomerTask[]>
-// GET /users/{id}/todos → { todos: [...] }. Маппер принимает unknown.
+// GET /users/{id}/todos → { todos: [...] }. The mapper takes unknown.
 ```
 
-Таблица маппинга (из эпика §7):
+Mapping table (from epic §7):
 
-| Поле модели | Источник | Правило |
+| Model field | Source | Rule |
 |---|---|---|
-| `Customer.id` | `id` | обязательное, целое > 0 |
-| `firstName`, `lastName`, `phone`, `email` | одноимённые | обязательные, непустая строка |
-| `city` | `address.city` | обязательное, непустая строка; `address` — объект |
-| `avatarUrl` | `image` | необязательное; строка с `https://` → она же, иначе `null` |
-| `CustomerTask.id` | `todos[].id` | обязательное, целое |
-| `text` | `todos[].todo` | обязательное, строка |
-| `isCompleted` | `todos[].completed` | обязательное, boolean |
+| `Customer.id` | `id` | required, integer > 0 |
+| `firstName`, `lastName`, `phone`, `email` | same-named | required, non-empty string |
+| `city` | `address.city` | required, non-empty string; `address` must be an object |
+| `avatarUrl` | `image` | optional; string with `https://` → as is, otherwise `null` |
+| `CustomerTask.id` | `todos[].id` | required, integer |
+| `text` | `todos[].todo` | required, string |
+| `isCompleted` | `todos[].completed` | required, boolean |
 
-Любое нарушение, `todos` не массив, корень не объект — ошибка. Модель собирается по
-одному полю, спред сырого ответа запрещён. Функции запроса сущностей бросают
-`RangeError`, если `isResourceId(customerId)` ложно — запрос не уходит.
-Не выходят за слой: `password`, `ssn`, `bank`, `ip`, `macAddress`, `crypto`, `userId`
-задач и любые поля сверх таблицы. В `console.*` ответы и ПДн не пишутся.
+Any violation, `todos` not an array, or a non-object root is an error. The model is built
+field by field; spreading the raw response is forbidden. The entities' request functions throw
+`RangeError` if `isResourceId(customerId)` is false — no request is sent.
+Must not leave the layer: `password`, `ssn`, `bank`, `ip`, `macAddress`, `crypto`, the tasks'
+`userId` and any field beyond the table. Responses and personal data are not written to `console.*`.
 
-### Файлы
+### Files
 
-| Путь | Действие | Назначение |
+| Path | Action | Purpose |
 |---|---|---|
-| `src/shared/api/httpClient.ts`, `errors.ts`, `resourceId.ts`, `useAsyncResource.ts`, `types.ts`, `index.ts` | создать (убрать `.gitkeep`) | клиент, ошибки, id, хук, типы |
-| `src/shared/api/__tests__/*.test.ts(x)` | создать | клиент, `parseResourceId`, хук |
-| `src/entities/customer/{api,model}/…`, `index.ts` | создать | запрос, `Customer`, маппер, `useCustomer` |
-| `src/entities/customer/__tests__/*` | создать | маппер, хук |
-| `src/entities/customer-task/{api,model}/…`, `index.ts` | создать | то же для задач |
-| `src/entities/customer-task/__tests__/*` | создать | маппер, хук |
+| `src/shared/api/httpClient.ts`, `errors.ts`, `resourceId.ts`, `useAsyncResource.ts`, `types.ts`, `index.ts` | create (remove `.gitkeep`) | client, errors, id, hook, types |
+| `src/shared/api/__tests__/*.test.ts(x)` | create | client, `parseResourceId`, hook |
+| `src/entities/customer/{api,model}/…`, `index.ts` | create | request, `Customer`, mapper, `useCustomer` |
+| `src/entities/customer/__tests__/*` | create | mapper, hook |
+| `src/entities/customer-task/{api,model}/…`, `index.ts` | create | same for tasks |
+| `src/entities/customer-task/__tests__/*` | create | mapper, hook |
 
-### Критерии приёмки
+### Acceptance criteria
 
-- **AC-1** — `getJson` на не-2xx бросает `HttpError` со статусом, на сетевой сбой —
-  `NetworkError`, на невалидный JSON — `ParseError`; отмена — `AbortError`. *(эпик AC-4, AC-5, AC-12)*
-- **AC-2** — `parseResourceId` принимает `'1'`, `'42'` и возвращает `null` для всех
-  недопустимых значений из контракта; запрос сущности с недопустимым id не вызывает `fetch`. *(эпик AC-1)*
-- **AC-3** — Мапперы отдают модель ровно с ключами `id, firstName, lastName, phone, email,
-  city, avatarUrl` и `id, text, isCompleted`; значения чувствительных полей фикстуры нигде
-  не встречаются в модели; ни один `console.*` не вызван со значениями этих полей. *(эпик AC-11)*
-- **AC-4** — Каждое нарушение правил маппинга (нет `firstName`; `address` отсутствует;
-  `phone` — число; корень — массив; `todos` не массив; нет `todo`; `completed` не boolean)
-  даёт `error`. *(эпик AC-6)*
+- **AC-1** — `getJson` throws `HttpError` with the status on non-2xx, `NetworkError` on a
+  network failure, `ParseError` on invalid JSON; cancellation — `AbortError`. *(epic AC-4, AC-5, AC-12)*
+- **AC-2** — `parseResourceId` accepts `'1'`, `'42'` and returns `null` for every
+  invalid value from the contract; an entity request with an invalid id does not call `fetch`. *(epic AC-1)*
+- **AC-3** — The mappers return a model with exactly the keys `id, firstName, lastName, phone, email,
+  city, avatarUrl` and `id, text, isCompleted`; the fixture's sensitive values appear nowhere
+  in the model; no `console.*` is called with the values of those fields. *(epic AC-11)*
+- **AC-4** — Every violation of the mapping rules (no `firstName`; `address` missing;
+  `phone` is a number; root is an array; `todos` not an array; no `todo`; `completed` not a boolean)
+  yields `error`. *(epic AC-6)*
 - **AC-5** — `image`: `https://…` → URL; `http://…`, `javascript:…`, `data:…`, `''`,
-  отсутствует → `null`. *(эпик AC-10)*
-- **AC-6** — Хуки: `404` → `not-found`, `500`/сеть → `error`; `retry()` повторяет запрос по
-  тому же адресу и приводит к `success`. *(эпик AC-4, AC-5)*
-- **AC-7** — Гонка: ответ по прежнему id, пришедший после ответа по новому, не меняет
-  состояние; запрос прежнего id отменён через `AbortSignal`; при смене id `state` — `loading`
-  в том же рендере; размонтирование отменяет запрос, ошибок в консоли нет. *(эпик AC-12, AC-13)*
+  missing → `null`. *(epic AC-10)*
+- **AC-6** — Hooks: `404` → `not-found`, `500`/network → `error`; `retry()` repeats the request to
+  the same URL and leads to `success`. *(epic AC-4, AC-5)*
+- **AC-7** — Race: a response for the previous id arriving after the response for the new one does not
+  change state; the previous id's request is cancelled via `AbortSignal`; on id change `state` is `loading`
+  in the same render; unmount cancels the request, no console errors. *(epic AC-12, AC-13)*
 
-### Тесты
+### Tests
 
-**Основные сценарии:**
+**Main scenarios:**
 
-- **S-1** — Given фикстура профиля со всеми чувствительными полями, when `mapCustomer`,
-  then ключи модели ровно из белого списка, значения `password/ssn/bank/…` не найдены
-  в `JSON.stringify(модель)`; `console.*` не вызывался — покрывает AC-3.
-- **S-2** — Given набор неверных тел (таблица `it.each`), when маппер, then ошибка;
-  парный позитивный случай — валидное тело → модель — покрывает AC-4.
-- **S-3** — Given `fetch` отвечает `404`, затем `500`, затем сетевой сбой, when хук,
-  then `not-found`, `error`, `error`; после `retry()` с успешным ответом — `success`,
-  `fetch` вызван повторно с тем же адресом — покрывает AC-6.
-- **S-4** — Given два управляемых промиса, when id сменился 1→2, ответ 2 пришёл раньше
-  ответа 1, then состояние — данные 2; сигнал запроса 1 `aborted`; сразу после смены id
-  `state.status === 'loading'` — покрывает AC-7.
-- **S-5** — Given `parseResourceId` с таблицей допустимых и недопустимых значений и
-  `getJson` с тремя видами сбоев — покрывает AC-1, AC-2, AC-5.
+- **S-1** — Given a profile fixture with all sensitive fields, when `mapCustomer`,
+  then the model keys are exactly the allowlist, the values of `password/ssn/bank/…` are not found
+  in `JSON.stringify(model)`; `console.*` was not called — covers AC-3.
+- **S-2** — Given a set of invalid bodies (an `it.each` table), when the mapper runs, then an error;
+  the paired positive case — a valid body → model — covers AC-4.
+- **S-3** — Given `fetch` responds `404`, then `500`, then a network failure, when the hook runs,
+  then `not-found`, `error`, `error`; after `retry()` with a successful response — `success`,
+  `fetch` called again with the same URL — covers AC-6.
+- **S-4** — Given two controlled promises, when the id changed 1→2 and response 2 arrived before
+  response 1, then the state is data 2; request 1's signal is `aborted`; right after the id change
+  `state.status === 'loading'` — covers AC-7.
+- **S-5** — Given `parseResourceId` with a table of valid and invalid values and
+  `getJson` with the three kinds of failure — covers AC-1, AC-2, AC-5.
 
-**Дополнительные сценарии** (заполняет исполнитель по ходу):
+**Additional scenarios** (filled in by the implementer as they go):
 
-- (пусто)
+- (empty)
 
-**Ручная проверка:**
+**Manual check:**
 
-- [ ] нет — полностью автоматизировано
+- [ ] none — fully automated
 
-### Ссылки
+### References
 
-- Эпик: §5, §7, §8, §9, §10
-- Конвенции: § 1 (слои, `public-api`), § 6 (данные, отмена), § 7 (безопасность),
-  § 8 (тесты: `vi.stubGlobal('fetch', …)`, фикстура с чувствительными полями)
+- Epic: §5, §7, §8, §9, §10
+- Conventions: § 1 (layers, `public-api`), § 6 (data, cancellation), § 7 (security),
+  § 8 (tests: `vi.stubGlobal('fetch', …)`, fixture with sensitive fields)
 
 ---
 
-## T-002: Общие UI-элементы и словарь строк
+## T-002: Shared UI elements and string dictionary
 
 ### Meta
 
-| Поле | Значение |
+| Field | Value |
 |---|---|
-| Тип | feature |
-| Размер | M |
-| Статус | not-started |
+| Type | feature |
+| Size | M |
+| Status | not-started |
 | Scope paths | `src/shared/ui/Card/**`, `src/shared/ui/StatusBadge/**`, `src/shared/ui/Avatar/**`, `src/shared/ui/Loader/**`, `src/shared/ui/index.ts`, `src/shared/i18n/he.ts` |
 | Blocked by | — |
 | Blocks | T-003, T-004 |
-| Разделы эпика | §5 FR-6 (откат аватара); §6; §8 (shared); §9 Доступность, Стили и строки; §10 AC-3, AC-7, AC-10, AC-14, AC-15 |
+| Epic sections | §5 FR-6 (avatar fallback); §6; §8 (shared); §9 Accessibility, Styles and strings; §10 AC-3, AC-7, AC-10, AC-14, AC-15 |
 
-### Цель
+### Goal
 
-Виджеты берут из `@/shared/ui` готовые `Card`, `StatusBadge`, `Avatar`, `Loader`, а из
-`he` — все строки §6 эпика; `he.ts` после этой задачи больше никто не правит.
+The widgets take ready-made `Card`, `StatusBadge`, `Avatar`, `Loader` from `@/shared/ui`, and
+all the epic §6 strings from `he`; after this task nobody else edits `he.ts`.
 
-### Контекст
+### Context
 
-Общий фундамент интерфейса. Единственная задача, которая пишет `he.ts`, поэтому
-добавляет сразу всё, что понадобится виджетам и странице. Компоненты универсальны —
-слов предметной области («customer», «task») в `shared` нет.
+The shared UI foundation. The only task that writes `he.ts`, so it adds everything the
+widgets and the page will need at once. The components are generic —
+no domain vocabulary ("customer", "task") in `shared`.
 
-### Входит
+### In scope
 
-- Четыре компонента с `I<Name>.ts`, `.module.css`, тестами; реэкспорт в `shared/ui/index.ts`.
-- Новые ключи `he.ts` (существующие ключи не менять и не переименовывать).
+- Four components with `I<Name>.ts`, `.module.css`, tests; re-export in `shared/ui/index.ts`.
+- New `he.ts` keys (existing keys are not changed or renamed).
 
-### Не входит
+### Out of scope
 
-- Состояния «пусто / не найдено / ошибка» с кнопкой — их рисуют виджеты своей разметкой
-  (общего компонента в эпике нет; см. «Открытые вопросы» в отчёте оркестратора).
-- Вычисление инициалов (T-003), проверка `https://` (T-001: маппер).
-- Правки `tokens.css`, `global.css`.
+- The "empty / not found / error" states with a button — the widgets render them with their own
+  markup (the epic has no shared component; see "Open questions" in the orchestrator's report).
+- Computing initials (T-003), the `https://` check (T-001: mapper).
+- Changes to `tokens.css`, `global.css`.
 
-### Контракты
+### Contracts
 
 ```ts
-// Card — секция с заголовком h2
+// Card — a section with an h2 heading
 interface ICardProps { title: string; children: ReactNode }
 
-// StatusBadge — текстовая метка; смысл передаётся текстом, тон — цветом
+// StatusBadge — a text label; meaning is conveyed by text, tone by colour
 interface IStatusBadgeProps { tone: 'success' | 'warning'; children: ReactNode }
 //   success → --success*, warning → --warning*
 
-// Avatar — картинка с откатом на инициалы
+// Avatar — an image with fallback to initials
 interface IAvatarProps { src: string | null; initials: string }
-//   src === null → только инициалы; <img alt=""> при src;
-//   событие error у img → инициалы. Размер — токен --space-16 (подходящего
-//   токена размера аватара нет; решение владельца — эпик §13 п. 10).
+//   src === null → initials only; <img alt=""> when src is set;
+//   img error event → initials. Size — the --space-16 token (there is no suitable
+//   avatar-size token; owner's decision — epic §13 item 10).
 
-// Loader — индикатор загрузки
+// Loader — loading indicator
 interface ILoaderProps { label: string }
-//   role="status", aria-busy="true", виден текст label; внешний вид — как .skeleton референса
+//   role="status", aria-busy="true", the label text is visible; looks like the reference's .skeleton
 
-// he.ts — новые ключи (имена фиксированы, их цитируют T-003, T-004, T-005)
+// he.ts — new keys (names are fixed; T-003, T-004, T-005 quote them)
 //   states:        { notFound: 'הלקוח לא נמצא',
 //                    error: 'לא הצלחנו לטעון את הנתונים', retry: 'נסו שוב' }
 //   profileCard:   { title: 'פרטי לקוח', loading: 'טוען פרטי לקוח',
@@ -302,104 +302,104 @@ interface ILoaderProps { label: string }
 //                    status: { open: 'פתוח', done: 'בוצע' } }
 ```
 
-### Файлы
+### Files
 
-| Путь | Действие | Назначение |
+| Path | Action | Purpose |
 |---|---|---|
-| `src/shared/ui/Card/{Card.tsx,ICard.ts,Card.module.css,__tests__/Card.test.tsx}` | создать | карточка |
-| `src/shared/ui/StatusBadge/…` | создать | статус |
-| `src/shared/ui/Avatar/…` | создать | аватар |
-| `src/shared/ui/Loader/…` | создать | загрузка |
-| `src/shared/ui/index.ts` | создать | реэкспорт четырёх компонентов и их `I*Props` |
-| `src/shared/i18n/he.ts` | изменить | только добавить ключи выше |
+| `src/shared/ui/Card/{Card.tsx,ICard.ts,Card.module.css,__tests__/Card.test.tsx}` | create | card |
+| `src/shared/ui/StatusBadge/…` | create | status |
+| `src/shared/ui/Avatar/…` | create | avatar |
+| `src/shared/ui/Loader/…` | create | loading |
+| `src/shared/ui/index.ts` | create | re-export of the four components and their `I*Props` |
+| `src/shared/i18n/he.ts` | modify | only add the keys above |
 
-### Критерии приёмки
+### Acceptance criteria
 
-- **AC-1** — `Card` рисует заголовок как `heading` уровня 2 с переданным `title` и
-  содержимое. *(эпик AC-15)*
-- **AC-2** — `Loader` находится по роли `status` и имени `label`, имеет `aria-busy="true"`. *(эпик AC-3)*
-- **AC-3** — `Avatar` с `src` рисует `img` с пустым `alt`; без `src` и после события
-  `error` рисует инициалы и не рисует `img`. *(эпик AC-10)*
-- **AC-4** — `StatusBadge` показывает переданный текст в обоих тонах; тон не единственный
-  носитель смысла. *(эпик AC-7)*
-- **AC-5** — В новых `*.module.css` нет цветовых литералов и числовых `px`/`rem`; в новых
-  `*.tsx`/`*.ts` нет ивритских литералов (кроме `he.ts`). *(эпик AC-14)*
+- **AC-1** — `Card` renders the heading as a level-2 `heading` with the given `title` and
+  the content. *(epic AC-15)*
+- **AC-2** — `Loader` is found by role `status` and name `label`, and has `aria-busy="true"`. *(epic AC-3)*
+- **AC-3** — `Avatar` with `src` renders an `img` with an empty `alt`; without `src` and after the
+  `error` event it renders the initials and no `img`. *(epic AC-10)*
+- **AC-4** — `StatusBadge` shows the given text in both tones; tone is not the only
+  carrier of meaning. *(epic AC-7)*
+- **AC-5** — New `*.module.css` files contain no colour literals and no numeric `px`/`rem`; new
+  `*.tsx`/`*.ts` files contain no Hebrew literals (except `he.ts`). *(epic AC-14)*
 
-### Тесты
+### Tests
 
-**Основные сценарии:**
+**Main scenarios:**
 
-- **S-1** — Given `<Card title={he.profileCard.title}>`, then `heading` уровня 2 с этим
-  именем; содержимое видно — AC-1.
-- **S-2** — Given `<Loader label={he.profileCard.loading}/>`, then `status` с именем и
+- **S-1** — Given `<Card title={he.profileCard.title}>`, then a level-2 `heading` with that
+  name; the content is visible — AC-1.
+- **S-2** — Given `<Loader label={he.profileCard.loading}/>`, then a `status` with the name and
   `aria-busy="true"` — AC-2.
-- **S-3** — Given `src="https://…"`, then `img` есть; when `fireEvent.error(img)`, then
-  `img` нет, инициалы видны — AC-3.
-- **S-4** — Given `src={null}`, then `img` нет, инициалы видны (негативная пара к S-3) — AC-3.
-- **S-5** — Given `StatusBadge` с `tone="warning"` и `tone="success"`, then текст виден в
-  обоих — AC-4. AC-5 проверяется `grep` из эпика AC-14 в hand-off.
+- **S-3** — Given `src="https://…"`, then an `img` exists; when `fireEvent.error(img)`, then
+  no `img`, initials visible — AC-3.
+- **S-4** — Given `src={null}`, then no `img`, initials visible (negative pair to S-3) — AC-3.
+- **S-5** — Given `StatusBadge` with `tone="warning"` and `tone="success"`, then the text is visible in
+  both — AC-4. AC-5 is verified with the `grep` from epic AC-14 in the hand-off.
 
-**Дополнительные сценарии** (заполняет исполнитель по ходу):
+**Additional scenarios** (filled in by the implementer as they go):
 
-- (пусто)
+- (empty)
 
-**Ручная проверка:**
+**Manual check:**
 
-- [ ] нет — полностью автоматизировано (внешний вид сверяется в T-003 и T-004)
+- [ ] none — fully automated (appearance is checked in T-003 and T-004)
 
-### Ссылки
+### References
 
-- Эпик: §6 (таблица строк), §8, §9, §13 п. 10
-- Дизайн: `.card`, `.status*`, `.skeleton`, `.profile*` в `customer-360.reference.html` — только `grep`
-- Конвенции: § 2 (папка компонента, `I<Name>.ts`), § 3 (токены, RTL), § 4 (строки), § 5 (a11y)
+- Epic: §6 (string table), §8, §9, §13 item 10
+- Design: `.card`, `.status*`, `.skeleton`, `.profile*` in `customer-360.reference.html` — `grep` only
+- Conventions: § 2 (component folder, `I<Name>.ts`), § 3 (tokens, RTL), § 4 (strings), § 5 (a11y)
 
 ---
 
-## T-003: Виджет `profile-card`
+## T-003: `profile-card` widget
 
 ### Meta
 
-| Поле | Значение |
+| Field | Value |
 |---|---|
-| Тип | feature |
-| Размер | M |
-| Статус | not-started |
+| Type | feature |
+| Size | M |
+| Status | not-started |
 | Scope paths | `src/widgets/profile-card/**` |
 | Blocked by | T-001, T-002 |
 | Blocks | T-005 |
-| Разделы эпика | §5 FR-2, FR-4, FR-5, FR-6; §6; §9; §10 AC-2, AC-3, AC-4, AC-5, AC-6, AC-10, AC-11, AC-14, AC-15 |
+| Epic sections | §5 FR-2, FR-4, FR-5, FR-6; §6; §9; §10 AC-2, AC-3, AC-4, AC-5, AC-6, AC-10, AC-11, AC-14, AC-15 |
 
-### Цель
+### Goal
 
-`<ProfileCard customerId={n} />` показывает карточку клиента во всех состояниях: данные,
-загрузка, не найден, ошибка с повтором.
+`<ProfileCard customerId={n} />` shows the customer card in all states: data,
+loading, not found, error with retry.
 
-### Контекст
+### Context
 
-Использует `useCustomer` (T-001) и компоненты `shared/ui` с ключами `he` (T-002).
-Независим от виджета задач: сбой одной карточки не затрагивает другую.
+Uses `useCustomer` (T-001) and the `shared/ui` components with the `he` keys (T-002).
+Independent of the tasks widget: a failure in one card does not affect the other.
 
-### Входит
+### In scope
 
-- Компонент `ProfileCard`, `IProfileCardProps`, CSS-модуль, `index.ts`, тесты.
-- Хук виджета для подготовки отображения (инициалы, полное имя) — вычисления не в теле рендера.
+- The `ProfileCard` component, `IProfileCardProps`, CSS module, `index.ts`, tests.
+- A widget hook that prepares the view (initials, full name) — computations are not in the render body.
 
-### Не входит
+### Out of scope
 
-- Запросы, маппер, `LoadState` (T-001); `Card`, `Avatar`, `Loader`, `he.ts` (T-002; не править).
-- Карточка задач (T-004), разбор id (T-005).
-- Блоки скриншота вне брифа: год присоединения, «מבוטחת פעילה», WhatsApp.
+- Requests, mapper, `LoadState` (T-001); `Card`, `Avatar`, `Loader`, `he.ts` (T-002; do not edit).
+- The tasks card (T-004), id parsing (T-005).
+- Screenshot blocks outside the brief: year joined, "מבוטחת פעילה", WhatsApp.
 
-### Контракты
+### Contracts
 
-Цитируются из T-001 и T-002; в этих слайсах ничего не менять.
+Quoted from T-001 and T-002; nothing in those slices is to be changed.
 
 ```ts
 // @/entities/customer (T-001)
 interface Customer { id: number; firstName: string; lastName: string
   phone: string; email: string; city: string; avatarUrl: string | null }
 function useCustomer(customerId: number): ILoadResult<Customer>
-// @/shared/api (T-001) — типы
+// @/shared/api (T-001) — types
 type LoadState<T> = { status: 'loading' } | { status: 'success'; data: T }
   | { status: 'not-found' } | { status: 'error' }
 interface ILoadResult<T> { state: LoadState<T>; retry: () => void }
@@ -411,120 +411,120 @@ Card({ title }), Loader({ label }), Avatar({ src, initials }), StatusBadge(...)
 he.profileCard.title / .loading / .fields.{id,phone,email,city}
 he.states.notFound / .error / .retry
 
-// эта задача
+// this task
 interface IProfileCardProps { customerId: number }
 // widgets/profile-card/index.ts: export { ProfileCard }
 ```
 
-Состояния: `loading` → `Loader` с `he.profileCard.loading`, подписей и значений нет;
-`not-found` → `he.states.notFound`, без кнопки повтора и без подписей;
-`error` → `he.states.error` в `role="alert"` + `button` `he.states.retry` → `retry()`;
-`success` → аватар, «имя фамилия», четыре пары «подпись: значение». Инициалы — первая
-буква имени + первая буква фамилии. Телефон и почта — `dir="ltr"`, `text-align: start`;
-длинные значения переносятся. Заголовок карточки — `Card` с `he.profileCard.title`.
+States: `loading` → `Loader` with `he.profileCard.loading`, no labels or values;
+`not-found` → `he.states.notFound`, no retry button and no labels;
+`error` → `he.states.error` in `role="alert"` + a `button` `he.states.retry` → `retry()`;
+`success` → avatar, "first last", four "label: value" pairs. Initials — first
+letter of the first name + first letter of the last name. Phone and email — `dir="ltr"`, `text-align: start`;
+long values wrap. The card heading — `Card` with `he.profileCard.title`.
 
-### Файлы
+### Files
 
-| Путь | Действие | Назначение |
+| Path | Action | Purpose |
 |---|---|---|
-| `src/widgets/profile-card/ProfileCard.tsx` | создать | компонент |
-| `src/widgets/profile-card/IProfileCard.ts` | создать | `IProfileCardProps` |
-| `src/widgets/profile-card/ProfileCard.module.css` | создать | стили, только токены, логические свойства |
-| `src/widgets/profile-card/useProfileCardView.ts` (имя на усмотрение) | создать | инициалы, полное имя |
-| `src/widgets/profile-card/index.ts` | создать | публичный API |
-| `src/widgets/profile-card/__tests__/ProfileCard.test.tsx` | создать | тесты |
+| `src/widgets/profile-card/ProfileCard.tsx` | create | component |
+| `src/widgets/profile-card/IProfileCard.ts` | create | `IProfileCardProps` |
+| `src/widgets/profile-card/ProfileCard.module.css` | create | styles, tokens only, logical properties |
+| `src/widgets/profile-card/useProfileCardView.ts` (name at your discretion) | create | initials, full name |
+| `src/widgets/profile-card/index.ts` | create | public API |
+| `src/widgets/profile-card/__tests__/ProfileCard.test.tsx` | create | tests |
 
-### Критерии приёмки
+### Acceptance criteria
 
-- **AC-1** — Given корректный профиль, then видны полное имя и четыре значения с подписями
-  (номер = `id`, город = `address.city`). *(эпик AC-2)*
-- **AC-2** — Given ответ не пришёл, then `status` «טוען פרטי לקוח» с `aria-busy`, подписей нет;
-  после ответа индикатор исчезает. *(эпик AC-3)*
-- **AC-3** — Given `404`, then «הלקוח לא נמצא», нет кнопки «נסו שוב», нет подписей. *(эпик AC-4)*
-- **AC-4** — Given `500` или сеть, then `alert` с ошибкой и кнопка; после нажатия и успешного
-  повтора — данные, `fetch` вызван повторно с тем же адресом. Given тело неожиданной формы —
-  то же поведение, виджет не падает. *(эпик AC-5, AC-6)*
-- **AC-5** — Given `image` `https://…` — есть изображение; `http://…`, `javascript:…`, `data:…`,
-  `''`, нет поля, либо событие `error` — инициалы. *(эпик AC-10)*
-- **AC-6** — Значения `password`, `ssn`, `bank`, `ip`, `macAddress`, `crypto` из фикстуры не
-  присутствуют в DOM. *(эпик AC-11)*
-- **AC-7** — Заголовок «פרטי לקוח» находится по роли `heading`; кнопка — по роли `button` и имени. *(эпик AC-15)*
-- **AC-8** — В файлах виджета нет ивритских литералов, цветовых литералов и числовых `px`/`rem`. *(эпик AC-14)*
+- **AC-1** — Given a valid profile, then the full name and four labelled values are visible
+  (number = `id`, city = `address.city`). *(epic AC-2)*
+- **AC-2** — Given no response yet, then a `status` "טוען פרטי לקוח" with `aria-busy`, no labels;
+  after the response the indicator disappears. *(epic AC-3)*
+- **AC-3** — Given `404`, then "הלקוח לא נמצא", no "נסו שוב" button, no labels. *(epic AC-4)*
+- **AC-4** — Given `500` or network, then an `alert` with the error and a button; after the click and a successful
+  retry — data, `fetch` called again with the same URL. Given a body of unexpected shape —
+  the same behaviour, the widget does not crash. *(epic AC-5, AC-6)*
+- **AC-5** — Given `image` `https://…` — an image is present; `http://…`, `javascript:…`, `data:…`,
+  `''`, no field, or the `error` event — initials. *(epic AC-10)*
+- **AC-6** — The values of `password`, `ssn`, `bank`, `ip`, `macAddress`, `crypto` from the fixture are
+  absent from the DOM. *(epic AC-11)*
+- **AC-7** — The heading "פרטי לקוח" is found by role `heading`; the button — by role `button` and name. *(epic AC-15)*
+- **AC-8** — The widget's files contain no Hebrew literals, colour literals or numeric `px`/`rem`. *(epic AC-14)*
 
-### Тесты
+### Tests
 
-**Основные сценарии** (`fetch` через `vi.stubGlobal`, фикстура с чувствительными полями):
+**Main scenarios** (`fetch` via `vi.stubGlobal`, fixture with sensitive fields):
 
-- **S-1** — Given успешный ответ, then имя, `id`, телефон, почта, город с подписями; чувствительные
-  значения отсутствуют в `document.body` — AC-1, AC-6.
-- **S-2** — Given неразрешённый промис, then `status` с именем и `aria-busy`, нет подписей; после
-  разрешения индикатор исчез — AC-2.
-- **S-3** — Given `404`, then «הלקוח לא נמצא», `queryByRole('button', { name: retry })` пуст — AC-3.
-- **S-4** — Given `500`, затем успех: `alert` + кнопка; клик (`userEvent`) → данные, `fetch`
-  вызван дважды с одним адресом. Парно: тело без `firstName` → то же сообщение — AC-4.
-- **S-5** — Given `image` из таблицы значений: `https://` → есть `img`; остальные и `error` → инициалы
+- **S-1** — Given a successful response, then name, `id`, phone, email, city with labels; sensitive
+  values are absent from `document.body` — AC-1, AC-6.
+- **S-2** — Given an unresolved promise, then a `status` with the name and `aria-busy`, no labels; after
+  resolution the indicator is gone — AC-2.
+- **S-3** — Given `404`, then "הלקוח לא נמצא", `queryByRole('button', { name: retry })` is empty — AC-3.
+- **S-4** — Given `500`, then success: `alert` + button; click (`userEvent`) → data, `fetch`
+  called twice with the same URL. Paired: a body without `firstName` → the same message — AC-4.
+- **S-5** — Given `image` from the value table: `https://` → `img` present; the rest and `error` → initials
   (`it.each`) — AC-5.
 
-**Дополнительные сценарии** (заполняет исполнитель по ходу):
+**Additional scenarios** (filled in by the implementer as they go):
 
-- (пусто)
+- (empty)
 
-**Ручная проверка:**
+**Manual check:**
 
-- [ ] Открыть виджет в браузере (временный монтаж запрещён вне scope — проверяется после T-005)
-  и сверить со скриншотом. Если браузера нет — записать это в hand-off.
+- [ ] Open the widget in the browser (temporary mounting is forbidden outside scope — checked after T-005)
+  and compare with the screenshot. If there is no browser — record that in the hand-off.
 
-### Ссылки
+### References
 
-- Эпик: §5, §6, §9, §10
-- Дизайн: `docs/design/customer-360.png` (блок «פרטי לקוחה»); классы `.profile*`, `.card`,
-  `.skeleton`, `.empty-state`, `.error-state` — только `grep`
-- Конвенции: § 2, § 3 (RTL, токены), § 4, § 5, § 6 (`LoadState`), § 8
+- Epic: §5, §6, §9, §10
+- Design: `docs/design/customer-360.png` (the "פרטי לקוחה" block); classes `.profile*`, `.card`,
+  `.skeleton`, `.empty-state`, `.error-state` — `grep` only
+- Conventions: § 2, § 3 (RTL, tokens), § 4, § 5, § 6 (`LoadState`), § 8
 
 ---
 
-## T-004: Виджет `customer-tasks`
+## T-004: `customer-tasks` widget
 
 ### Meta
 
-| Поле | Значение |
+| Field | Value |
 |---|---|
-| Тип | feature |
-| Размер | M |
-| Статус | not-started |
+| Type | feature |
+| Size | M |
+| Status | not-started |
 | Scope paths | `src/widgets/customer-tasks/**` |
 | Blocked by | T-001, T-002 |
 | Blocks | T-005 |
-| Разделы эпика | §5 FR-3, FR-4, FR-5; §6; §9; §10 AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-11, AC-14, AC-15 |
+| Epic sections | §5 FR-3, FR-4, FR-5; §6; §9; §10 AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-11, AC-14, AC-15 |
 
-### Цель
+### Goal
 
-`<CustomerTasks customerId={n} />` показывает карточку задач клиента: список со статусами,
-пусто, загрузка, не найден, ошибка с повтором.
+`<CustomerTasks customerId={n} />` shows the customer's tasks card: a list with statuses,
+empty, loading, not found, error with retry.
 
-### Контекст
+### Context
 
-Использует `useCustomerTasks` (T-001) и компоненты `shared/ui` с ключами `he` (T-002).
-Идёт параллельно с T-003, файлов не делит.
+Uses `useCustomerTasks` (T-001) and the `shared/ui` components with the `he` keys (T-002).
+Runs in parallel with T-003 and shares no files with it.
 
-### Входит
+### In scope
 
-- Компонент `CustomerTasks`, `ICustomerTasksProps`, CSS-модуль, `index.ts`, тесты.
-- Строка списка: текст задачи и `StatusBadge`.
+- The `CustomerTasks` component, `ICustomerTasksProps`, CSS module, `index.ts`, tests.
+- A list row: task text and a `StatusBadge`.
 
-### Не входит
+### Out of scope
 
-- Запросы, маппер (T-001); `Card`, `StatusBadge`, `Loader`, `he.ts` (T-002; не править).
-- Карточка клиента (T-003), разбор id (T-005).
-- Пагинация, сортировка, блоки скриншота вне брифа.
+- Requests, mapper (T-001); `Card`, `StatusBadge`, `Loader`, `he.ts` (T-002; do not edit).
+- The customer card (T-003), id parsing (T-005).
+- Pagination, sorting, screenshot blocks outside the brief.
 
-### Контракты
+### Contracts
 
 ```ts
 // @/entities/customer-task (T-001)
 interface CustomerTask { id: number; text: string; isCompleted: boolean }
 function useCustomerTasks(customerId: number): ILoadResult<CustomerTask[]>
-// @/shared/api (T-001) — типы
+// @/shared/api (T-001) — types
 type LoadState<T> = { status: 'loading' } | { status: 'success'; data: T }
   | { status: 'not-found' } | { status: 'error' }
 interface ILoadResult<T> { state: LoadState<T>; retry: () => void }
@@ -537,177 +537,177 @@ StatusBadge({ tone: 'success' | 'warning', children })
 he.customerTasks.title / .loading / .empty / .status.{open,done}
 he.states.notFound / .error / .retry
 
-// эта задача
+// this task
 interface ICustomerTasksProps { customerId: number }
 // widgets/customer-tasks/index.ts: export { CustomerTasks }
 ```
 
-Состояния: `loading` → `Loader` с `he.customerTasks.loading`; `not-found` →
-`he.states.notFound` без кнопки (эпик §13 п. 3, 8); `error` → `he.states.error` в
-`role="alert"` + кнопка `he.states.retry`; `success` с пустым массивом →
-`he.customerTasks.empty`; с задачами — `ul`/`li`, ключ — `task.id`, порядок ответа API.
-`isCompleted: true` → «בוצע» + `tone="success"`; `false` → «פתוח» + `tone="warning"`.
+States: `loading` → `Loader` with `he.customerTasks.loading`; `not-found` →
+`he.states.notFound` without a button (epic §13 items 3, 8); `error` → `he.states.error` in
+`role="alert"` + the `he.states.retry` button; `success` with an empty array →
+`he.customerTasks.empty`; with tasks — `ul`/`li`, key — `task.id`, API response order.
+`isCompleted: true` → "בוצע" + `tone="success"`; `false` → "פתוח" + `tone="warning"`.
 
-### Файлы
+### Files
 
-| Путь | Действие | Назначение |
+| Path | Action | Purpose |
 |---|---|---|
-| `src/widgets/customer-tasks/CustomerTasks.tsx` | создать | компонент |
-| `src/widgets/customer-tasks/ICustomerTasks.ts` | создать | `ICustomerTasksProps` |
-| `src/widgets/customer-tasks/CustomerTasks.module.css` | создать | стили, только токены |
-| `src/widgets/customer-tasks/index.ts` | создать | публичный API |
-| `src/widgets/customer-tasks/__tests__/CustomerTasks.test.tsx` | создать | тесты |
+| `src/widgets/customer-tasks/CustomerTasks.tsx` | create | component |
+| `src/widgets/customer-tasks/ICustomerTasks.ts` | create | `ICustomerTasksProps` |
+| `src/widgets/customer-tasks/CustomerTasks.module.css` | create | styles, tokens only |
+| `src/widgets/customer-tasks/index.ts` | create | public API |
+| `src/widgets/customer-tasks/__tests__/CustomerTasks.test.tsx` | create | tests |
 
-### Критерии приёмки
+### Acceptance criteria
 
-- **AC-1** — Given `todos` с задачами, then для каждой виден текст и статус: `completed: true` →
-  «בוצע», `false` → «פתוח»; перепутать нельзя. *(эпик AC-7)*
-- **AC-2** — Given `todos: []`, then «אין משימות ללקוח»; given хотя бы одна задача — этого текста нет. *(эпик AC-8)*
-- **AC-3** — Given ответ не пришёл, then `status` «טוען משימות» с `aria-busy`; после ответа исчезает. *(эпик AC-3)*
-- **AC-4** — Given `404`, then «הלקוח לא נמצא» без кнопки «נסו שוב». *(эпик AC-4)*
-- **AC-5** — Given `500`/сеть/`todos` не массив/нет `todo`/`completed` не boolean, then `alert` и
-  кнопка; повтор после успеха показывает список, `fetch` вызван повторно с тем же адресом. *(эпик AC-5, AC-6)*
-- **AC-6** — `userId` и прочие поля сверх `id, todo, completed` не присутствуют в DOM. *(эпик AC-11)*
-- **AC-7** — Заголовок «משימות טיפול» — `heading`; кнопка — `button` с именем. *(эпик AC-15)*
-- **AC-8** — В файлах виджета нет ивритских литералов, цветовых литералов и числовых `px`/`rem`. *(эпик AC-14)*
+- **AC-1** — Given `todos` with tasks, then each shows its text and status: `completed: true` →
+  "בוצע", `false` → "פתוח"; they cannot be mixed up. *(epic AC-7)*
+- **AC-2** — Given `todos: []`, then "אין משימות ללקוח"; given at least one task — that text is absent. *(epic AC-8)*
+- **AC-3** — Given no response yet, then a `status` "טוען משימות" with `aria-busy`; after the response it disappears. *(epic AC-3)*
+- **AC-4** — Given `404`, then "הלקוח לא נמצא" without a "נסו שוב" button. *(epic AC-4)*
+- **AC-5** — Given `500`/network/`todos` not an array/no `todo`/`completed` not a boolean, then an `alert` and
+  a button; a retry after success shows the list, `fetch` called again with the same URL. *(epic AC-5, AC-6)*
+- **AC-6** — `userId` and other fields beyond `id, todo, completed` are absent from the DOM. *(epic AC-11)*
+- **AC-7** — The heading "משימות טיפול" is a `heading`; the button is a `button` with a name. *(epic AC-15)*
+- **AC-8** — The widget's files contain no Hebrew literals, colour literals or numeric `px`/`rem`. *(epic AC-14)*
 
-### Тесты
+### Tests
 
-**Основные сценарии:**
+**Main scenarios:**
 
-- **S-1** — Given две задачи (`completed: true` и `false`), then в строке первой «בוצע», второй «פתוח»,
-  и «בוצע» нет в строке второй — AC-1.
-- **S-2** — Given `todos: []` → «אין משימות ללקוח»; given одна задача → текста нет — AC-2.
-- **S-3** — Given неразрешённый промис → `status` «טוען משימות» с `aria-busy`; затем исчез — AC-3.
-- **S-4** — Given `404` → «הלקוח לא נמצא», кнопки нет; given `500` → `alert` + кнопка, клик →
-  список, повторный `fetch` с тем же адресом — AC-4, AC-5.
-- **S-5** — Given `it.each` тел неверной формы → `alert`, виджет не падает; фикстура с `userId`
-  → значение `userId` не в DOM — AC-5, AC-6.
+- **S-1** — Given two tasks (`completed: true` and `false`), then the first row shows "בוצע", the second "פתוח",
+  and "בוצע" is absent from the second row — AC-1.
+- **S-2** — Given `todos: []` → "אין משימות ללקוח"; given one task → the text is absent — AC-2.
+- **S-3** — Given an unresolved promise → a `status` "טוען משימות" with `aria-busy`; then it is gone — AC-3.
+- **S-4** — Given `404` → "הלקוח לא נמצא", no button; given `500` → `alert` + button, click →
+  list, repeated `fetch` with the same URL — AC-4, AC-5.
+- **S-5** — Given `it.each` of malformed bodies → `alert`, the widget does not crash; a fixture with `userId`
+  → the `userId` value is not in the DOM — AC-5, AC-6.
 
-**Дополнительные сценарии** (заполняет исполнитель по ходу):
+**Additional scenarios** (filled in by the implementer as they go):
 
-- (пусто)
+- (empty)
 
-**Ручная проверка:**
+**Manual check:**
 
-- [ ] Сверить со скриншотом (блок «פניות אחרונות») после T-005. Если браузера нет — записать в hand-off.
+- [ ] Compare with the screenshot (the "פניות אחרונות" block) after T-005. If there is no browser — record it in the hand-off.
 
-### Ссылки
+### References
 
-- Эпик: §5, §6, §9, §10
-- Дизайн: `docs/design/customer-360.png` (блок «פניות אחרונות»); классы `.status*`, `.card`,
-  `.skeleton`, `.empty-state`, `.error-state` — только `grep`
-- Конвенции: § 2 (стабильные ключи), § 3, § 4, § 5, § 6, § 8
+- Epic: §5, §6, §9, §10
+- Design: `docs/design/customer-360.png` (the "פניות אחרונות" block); classes `.status*`, `.card`,
+  `.skeleton`, `.empty-state`, `.error-state` — `grep` only
+- Conventions: § 2 (stable keys), § 3, § 4, § 5, § 6, § 8
 
 ---
 
-## T-005: Страница `customer` — разбор id и сборка
+## T-005: `customer` page — id parsing and assembly
 
 ### Meta
 
-| Поле | Значение |
+| Field | Value |
 |---|---|
-| Тип | feature |
-| Размер | S |
-| Статус | not-started |
+| Type | feature |
+| Size | S |
+| Status | not-started |
 | Scope paths | `src/pages/customer/**`, `src/app/__tests__/App.test.tsx` |
 | Blocked by | T-003, T-004 |
 | Blocks | — |
-| Разделы эпика | §5 FR-1, FR-5, FR-8; §9; §10 AC-1, AC-9, AC-12, AC-13, AC-14, AC-16 |
+| Epic sections | §5 FR-1, FR-5, FR-8; §9; §10 AC-1, AC-9, AC-12, AC-13, AC-14, AC-16 |
 
-### Цель
+### Goal
 
-`/customers/:customerId` показывает заголовок и два виджета; недопустимый id даёт «הלקוח לא
-נמצא» без единого запроса; при смене клиента на экране всегда актуальные данные.
+`/customers/:customerId` shows the heading and the two widgets; an invalid id yields "הלקוח לא
+נמצא" without a single request; on customer change the screen always shows current data.
 
-### Контекст
+### Context
 
-Последняя задача: собирает готовые виджеты. Страница — только композиция, без бизнес-логики.
-Существующий `App.test.tsx` рендерит страницу клиента, после сборки она начнёт обращаться к
-сети — тест нужно изолировать от неё.
+The last task: it assembles the finished widgets. The page is composition only, no business logic.
+The existing `App.test.tsx` renders the customer page; after assembly it will start hitting the
+network — the test must be isolated from it.
 
-### Входит
+### In scope
 
-- Разбор `customerId` через `parseResourceId` (T-001) в хуке страницы.
-- Композиция `ProfileCard` и `CustomerTasks`; недопустимый id → сообщение вместо виджетов.
-- Тест страницы на `MemoryRouter`.
-- В `src/app/__tests__/App.test.tsx` — только добавить подмену `fetch` (`vi.stubGlobal`), чтобы
-  тесты оболочки не ходили в сеть. Существующие проверки не менять и не ослаблять.
-- Итоговая проверка спеки: `grep` из эпика AC-14, `git status` по `package.json`, lock-файлу,
+- Parsing `customerId` via `parseResourceId` (T-001) in a page hook.
+- Composition of `ProfileCard` and `CustomerTasks`; invalid id → a message instead of the widgets.
+- A page test on `MemoryRouter`.
+- In `src/app/__tests__/App.test.tsx` — only add a `fetch` stub (`vi.stubGlobal`) so that
+  the shell tests do not hit the network. Existing assertions are not changed or weakened.
+- The spec's final check: the `grep` from epic AC-14, `git status` for `package.json`, the lock file,
   `tools/`, `docs/design/`.
 
-### Не входит
+### Out of scope
 
-- Поиск клиента, правки виджетов, сущностей, `shared`, `he.ts` (все ключи уже есть).
-- Новые строки: сообщение для недопустимого id — `he.states.notFound`.
+- Customer search, changes to the widgets, entities, `shared`, `he.ts` (all keys already exist).
+- New strings: the message for an invalid id is `he.states.notFound`.
 
-### Контракты
+### Contracts
 
 ```ts
 // @/shared/api (T-001)
 function parseResourceId(raw: string | undefined): number | null
 // @/widgets/profile-card (T-003)     ProfileCard({ customerId: number })
 // @/widgets/customer-tasks (T-004)   CustomerTasks({ customerId: number })
-// @/shared/i18n/he (T-002)           he.states.notFound, he.customerPage.* (уже есть)
-// Маршрут: ROUTES.customer = '/customers/:customerId' (src/shared/config/routes.ts, не менять)
+// @/shared/i18n/he (T-002)           he.states.notFound, he.customerPage.* (already exist)
+// Route: ROUTES.customer = '/customers/:customerId' (src/shared/config/routes.ts, do not change)
 ```
 
-Страница сохраняет `h1` и подзаголовок текущей версии. Недопустимый id — сообщение
-`he.states.notFound`, виджеты не монтируются, `fetch` не вызывается. Виджеты получают
-`key`/`customerId` так, чтобы при смене клиента старые данные не оставались на экране
-(гарантия в хуках T-001; страница её не ломает).
+The page keeps the current version's `h1` and subtitle. An invalid id — the
+`he.states.notFound` message, the widgets are not mounted, `fetch` is not called. The widgets receive
+`key`/`customerId` such that on customer change the old data does not remain on screen
+(guaranteed by the T-001 hooks; the page does not break it).
 
-### Файлы
+### Files
 
-| Путь | Действие | Назначение |
+| Path | Action | Purpose |
 |---|---|---|
-| `src/pages/customer/CustomerPage.tsx` | изменить | композиция |
-| `src/pages/customer/CustomerPage.module.css` | изменить | раскладка двух карточек, токены |
-| `src/pages/customer/useCustomerId.ts` (имя на усмотрение) | создать | разбор параметра маршрута |
-| `src/pages/customer/__tests__/CustomerPage.test.tsx` | создать | тесты страницы |
-| `src/app/__tests__/App.test.tsx` | изменить | только подмена `fetch` |
+| `src/pages/customer/CustomerPage.tsx` | modify | composition |
+| `src/pages/customer/CustomerPage.module.css` | modify | two-card layout, tokens |
+| `src/pages/customer/useCustomerId.ts` (name at your discretion) | create | route param parsing |
+| `src/pages/customer/__tests__/CustomerPage.test.tsx` | create | page tests |
+| `src/app/__tests__/App.test.tsx` | modify | `fetch` stub only |
 
-### Критерии приёмки
+### Acceptance criteria
 
-- **AC-1** — Given `/customers/abc`, `/0`, `/-1`, `/1.5`, `/007`, then «הלקוח לא נמצא», `fetch` не вызван;
-  given `/customers/1`, then `fetch` вызван. *(эпик AC-1)*
-- **AC-2** — Given запрос задач упал, а профиль успешен, then карточка клиента с данными, карточка
-  задач — ошибка с кнопкой; и наоборот. Повтор в одной карточке не перезапрашивает другую. *(эпик AC-9)*
-- **AC-3** — Given клиент 1 с задержкой, when переход на клиента 2, ответ 2 раньше ответа 1, then в обеих
-  карточках данные клиента 2; запрос клиента 1 отменён. *(эпик AC-12)*
-- **AC-4** — Given показан клиент 1, when адрес сменился на 2 и данные грузятся, then данные клиента 1 не
-  видны, показаны индикаторы загрузки. *(эпик AC-13)*
-- **AC-5** — `grep -rnP '[\x{0590}-\x{05FF}]' src --include=*.ts --include=*.tsx` — совпадения только в
-  `src/shared/i18n/he.ts`; в новых `*.module.css` нет цветовых литералов и числовых `px`/`rem`. *(эпик AC-14)*
-- **AC-6** — `npm run validate` зелёный; `git status` не показывает изменений `package.json`,
-  lock-файла, `tools/`, `docs/design/`. *(эпик AC-16)*
+- **AC-1** — Given `/customers/abc`, `/0`, `/-1`, `/1.5`, `/007`, then "הלקוח לא נמצא", `fetch` not called;
+  given `/customers/1`, then `fetch` called. *(epic AC-1)*
+- **AC-2** — Given the tasks request failed and the profile succeeded, then the customer card has data, the tasks
+  card an error with a button; and vice versa. Retrying in one card does not re-request the other. *(epic AC-9)*
+- **AC-3** — Given customer 1 with a delay, when navigating to customer 2, response 2 before response 1, then both
+  cards show customer 2's data; customer 1's request is cancelled. *(epic AC-12)*
+- **AC-4** — Given customer 1 is shown, when the URL changed to 2 and the data is loading, then customer 1's data is not
+  visible, loading indicators are shown. *(epic AC-13)*
+- **AC-5** — `grep -rnP '[\x{0590}-\x{05FF}]' src --include=*.ts --include=*.tsx` — matches only in
+  `src/shared/i18n/he.ts`; new `*.module.css` files contain no colour literals and no numeric `px`/`rem`. *(epic AC-14)*
+- **AC-6** — `npm run validate` is green; `git status` shows no changes to `package.json`,
+  the lock file, `tools/`, `docs/design/`. *(epic AC-16)*
 
-### Тесты
+### Tests
 
-**Основные сценарии:**
+**Main scenarios:**
 
-- **S-1** — Given `it.each(['abc','0','-1','1.5','007'])`, then «הלקוח לא נמצא» и `fetch` не вызван;
-  given `1` — вызван — AC-1.
-- **S-2** — Given `fetch` по URL: профиль `200`, задачи `500`, then данные клиента и `alert` в карточке задач;
-  клик «נסו שוב» запрашивает только задачи — AC-2.
-- **S-3** — Given управляемые промисы, when `navigate` 1→2, ответ 2, затем ответ 1, then на экране
-  клиент 2 в обеих карточках, сигнал запроса 1 `aborted` — AC-3.
-- **S-4** — Given клиент 1 показан, when переход на 2 без ответа, then имя клиента 1 в DOM нет,
-  индикаторы загрузки есть — AC-4.
-- **S-5** — Given существующие тесты оболочки с подменой `fetch`, then все прежние проверки проходят без
-  изменений — AC-6.
+- **S-1** — Given `it.each(['abc','0','-1','1.5','007'])`, then "הלקוח לא נמצא" and `fetch` not called;
+  given `1` — called — AC-1.
+- **S-2** — Given `fetch` by URL: profile `200`, tasks `500`, then customer data and an `alert` in the tasks card;
+  clicking "נסו שוב" requests only the tasks — AC-2.
+- **S-3** — Given controlled promises, when `navigate` 1→2, response 2, then response 1, then the screen shows
+  customer 2 in both cards, request 1's signal is `aborted` — AC-3.
+- **S-4** — Given customer 1 is shown, when navigating to 2 with no response, then customer 1's name is not in the DOM,
+  loading indicators are present — AC-4.
+- **S-5** — Given the existing shell tests with the `fetch` stub, then all previous assertions pass without
+  changes — AC-6.
 
-**Дополнительные сценарии** (заполняет исполнитель по ходу):
+**Additional scenarios** (filled in by the implementer as they go):
 
-- (пусто)
+- (empty)
 
-**Ручная проверка:**
+**Manual check:**
 
-- [ ] `npm run dev` и `npm run dev:offline`: `/customers/1`, `/customers/9999`, `/customers/abc`;
-  сверка со скриншотом. Если браузера нет — записать в hand-off.
+- [ ] `npm run dev` and `npm run dev:offline`: `/customers/1`, `/customers/9999`, `/customers/abc`;
+  compare with the screenshot. If there is no browser — record it in the hand-off.
 
-### Ссылки
+### References
 
-- Эпик: §5 FR-1, FR-5, FR-8; §10; §11
-- Дизайн: `docs/design/customer-360.png` — раскладка двух колонок, `docs/design/README.md`
-- Конвенции: § 1 (страница — только композиция), § 6, § 8
+- Epic: §5 FR-1, FR-5, FR-8; §10; §11
+- Design: `docs/design/customer-360.png` — two-column layout, `docs/design/README.md`
+- Conventions: § 1 (page is composition only), § 6, § 8
