@@ -31,19 +31,36 @@ function git(args, { allowFail = false } = {}) {
   }
 }
 
+// Files that every checkpoint of this course version must contain. Tags from an earlier
+// version of the course (a different toolchain) lack them and are treated as missing.
+const VERSION_MARKERS = ['AGENTS.md', '.github/skills/sdd/SKILL.md']
+
 function hasTag(tag) {
   return git(['rev-parse', '--verify', '--quiet', `refs/tags/${tag}`], { allowFail: true }) !== null
+}
+
+function isCurrentVersion(tag) {
+  return VERSION_MARKERS.every((file) => git(['cat-file', '-e', `${tag}:${file}`], { allowFail: true }) !== null)
+}
+
+function tagState(tag) {
+  if (!hasTag(tag)) return 'missing'
+  return isCurrentVersion(tag) ? 'ok' : 'outdated'
 }
 
 function printList() {
   console.log('\nWorkshop checkpoints:\n')
   let missing = 0
+  let outdated = 0
   for (const point of CHECKPOINTS) {
-    const isAvailable = hasTag(point.tag)
-    if (!isAvailable) missing += 1
-    console.log(`  ${point.n}  ${point.title}${isAvailable ? '' : '  — tag not found'}`)
+    const state = tagState(point.tag)
+    if (state === 'missing') missing += 1
+    if (state === 'outdated') outdated += 1
+    const note = state === 'missing' ? '  — tag not found' : state === 'outdated' ? '  — tag from an earlier course version, unusable' : ''
+    console.log(`  ${point.n}  ${point.title}${note}`)
   }
   if (missing > 0) console.log('\nSome tags are missing. Run: git fetch --tags origin')
+  if (outdated > 0) console.log('\nOutdated tags are ignored. The checkpoints for this version are published after the dry run.')
   console.log('\nJump: npm run catchup -- <number>\n')
 }
 
@@ -65,11 +82,17 @@ function moveBranch(branch, tag) {
 }
 
 function goTo(point) {
-  if (!hasTag(point.tag)) {
+  if (tagState(point.tag) !== 'ok') {
+    // Drop a stale local tag so the fetch can bring the current one.
+    if (hasTag(point.tag)) git(['tag', '-d', point.tag], { allowFail: true })
     git(['fetch', '--tags', 'origin'], { allowFail: true })
   }
-  if (!hasTag(point.tag)) {
+  const state = tagState(point.tag)
+  if (state === 'missing') {
     throw new Error(`Tag ${point.tag} not found. Run: git fetch --tags origin`)
+  }
+  if (state === 'outdated') {
+    throw new Error(`Tag ${point.tag} belongs to an earlier version of the course and cannot be used with this repository. The checkpoints for this version are published after the dry run.`)
   }
 
   const { backup, isDirty } = saveCurrentWork()
