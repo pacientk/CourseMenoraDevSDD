@@ -1,0 +1,31 @@
+{
+  // Copilot agent mode: let the gates and read-only git commands run without a prompt.
+  // Everything else (file writes outside the editor tools, other commands) still asks.
+  "chat.tools.terminal.autoApprove": {
+    "npm run": true,
+    "npx vitest": true,
+    "npx tsc": true,
+    "npx oxlint": true,
+    "node scripts/": true,
+    "node tools/reviewer/": true,
+    "git status": true,
+    "git diff": true,
+    "git log": true,
+    "git branch": true,
+    "git switch": true,
+    "git add": true,
+    "git commit": true,
+    "git merge": true,
+    "git rev-parse": true,
+    "git merge-base": true,
+    "git show-ref": true,
+    "git ls-files": true
+  },
+  // A full wave (several subagents, gates, hand-offs) needs more than the default 25.
+  "chat.agent.maxRequests": 100,
+  "chat.useAgentsMdFile": true,
+  "chat.useAgentSkills": true,
+  "files.eol": "\n",
+  "editor.formatOnSave": false,
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
